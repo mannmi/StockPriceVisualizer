@@ -1,0 +1,83 @@
+services:
+  python_app:
+    build: .
+    command: /bin/sh -c "python main.py && sleep infinity || sleep infinity"
+    volumes:
+      - ./src/server:/app/server
+      - ./src/config_loader:/app/config_loader
+      - ./requirements.txt:/app/requirements.txt
+      - ./src/os_calls:/app/os_calls
+      - ./src/marketCheck:/app/marketCheck
+      - ./src:/app/src
+      - ./ui/:/app/ui/
+    ports:
+      - "5000:5000"
+    depends_on:
+      - db
+    environment:
+      - FLASK_RUN_HOST=0.0.0.0
+    networks:
+      custom_network:
+        ipv4_address: 172.20.0.2
+  #db dose not have to be started see condtional code #todo latter add a try catch. mongo is atm mandetory :)
+  db:
+    image: mysql:latest
+    restart: always
+    environment:
+      MYSQL_DATABASE: 'mydatabase'
+      MYSQL_USER: 'myuser'
+      MYSQL_PASSWORD: 'mypassword'
+      MYSQL_ROOT_PASSWORD: 'myrootpassword'
+    ports:
+      - '3306:3306'
+    volumes:
+      - my-db:/var/lib/mysql
+      - ./data/mysql:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      interval: 1m
+      timeout: 10s
+      retries: 3
+    networks:
+      custom_network:
+        ipv4_address: 172.20.0.3
+
+  qt-app:
+    build: .
+    environment:
+      - DISPLAY=${DISPLAY}
+    command: /bin/sh -c "python main.py && sleep infinity || sleep infinity"
+    container_name: qt-gui-app
+    volumes:
+      - ./src/server:/app/server
+      - ./src/config_loader:/app/config_loader
+      - ./requirements.txt:/app/requirements.txt
+      - ./src/os_calls:/app/os_calls
+      - ./src/marketCheck:/app/marketCheck
+      - ./src:/app/src
+      - ./ui/:/app/ui/
+      - /tmp/.X11-unix:/tmp/.X11-unix
+    network_mode: "host"
+    devices:
+      - "/dev/dri:/dev/dri"
+    privileged: true
+
+  test:
+      build: .
+      #command: python -m unittest tests
+      #todo this line was added to debug the docker contianer remove when i deployment :)
+      command: bash -c "python -m unittest discover -s tests"
+      volumes:
+        - .:/app
+        - ./requirements.txt:/app/requirements.txt
+      depends_on:
+        - db
+
+networks:
+  custom_network:
+    driver: bridge
+
+
+volumes:
+  my-db:
+  mongo-data:

@@ -1,0 +1,180 @@
+<ButtonStyle@Button>:
+    background_normal: ''
+    background_color: 0.2, 0.6, 0.86, 1
+    color: 1, 1, 1, 1
+    canvas.before:
+        Color:
+            rgba: 0.2, 0.6, 0.86, 1
+        RoundedRectangle:
+            size: self.size
+            pos: self.pos
+            radius: [15]
+
+<HomeScreen>:
+    BoxLayout:
+        orientation: 'vertical'
+        padding: 10
+        spacing: 10
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint_y: None
+            height: 100
+            spacing: 10
+            ButtonStyle:
+                text: 'Stats'
+                on_press: app.root.current = 'stats'
+            ButtonStyle:
+                text: 'Portfolio'
+                on_press: app.root.current = 'portfolio'
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint_y: None
+            height: 100
+            spacing: 10
+            ButtonStyle:
+                text: 'DataFrame'
+                on_press: app.root.current = 'dataframe'
+            ButtonStyle:
+                text: 'Settings'
+                on_press: app.root.current = 'settings'
+
+<DataFrameScreen>:
+    BoxLayout:
+        orientation: 'vertical'
+        padding: 10
+        spacing: 10
+        ButtonStyle:
+            text: 'DataFrame Screen'
+            size_hint_y: None
+            height: 50
+        BoxLayout:
+            size_hint_y: None
+            height: 50
+            spacing: 10
+            ButtonStyle:
+                text: 'Home'
+                on_press: app.root.current = 'home'
+            ButtonStyle:
+                text: 'DataFrame'
+                on_press: app.root.current = 'dataframe'
+            ButtonStyle:
+                text: 'Stats'
+                on_press: app.root.current = 'stats'
+            ButtonStyle:
+                text: 'Portfolio'
+                on_press: app.root.current = 'portfolio'
+            ButtonStyle:
+                text: 'Settings'
+                on_press: app.root.current = 'settings'
+
+<SettingsScreen>:
+    BoxLayout:
+        orientation: 'vertical'
+        padding: 10
+        spacing: 10
+        ButtonStyle:
+            text: 'Settings Screen'
+            size_hint_y: None
+            height: 50
+        ButtonStyle:
+            text: 'Back'
+            size_hint_y: None
+            height: 50
+            on_press: app.root.current = app.root.previous()
+
+<StatsScreen>:
+    BoxLayout:
+        orientation: 'vertical'
+        padding: 10
+        spacing: 10
+        ButtonStyle:
+            text: 'Stats Screen'
+            size_hint_y: None
+            height: 50
+
+<PortfolioScreen>:
+    BoxLayout:
+        orientation: 'vertical'
+        padding: 10
+        spacing: 10
+        ButtonStyle:
+            text: 'Portfolio Screen'
+            size_hint_y: None
+            height: 50
+        ButtonStyle:
+            id: hamburger_button
+            text: 'Menu'
+            size_hint_y: None
+            height: 50
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint_y: None
+            height: 50
+            spacing: 10
+            Button:
+                id: line1
+                size_hint_y: None
+                height: 5
+                background_normal: ''
+                background_color: 0, 0, 0, 1
+            Button:
+                id: line2
+                size_hint_y: None
+                height: 5
+                background_normal: ''
+                background_color: 0, 0, 0, 1
+            Button:
+                id: line3
+                size_hint_y: None
+                height: 5
+                background_normal: ''
+                background_color: 0, 0, 0, 1
+
+<PortfolioScreen>:
+    BoxLayout:
+        orientation: 'vertical'
+        padding: 10
+        spacing: 10
+        ButtonStyle:
+            text: 'Portfolio Screen'
+            size_hint_y: None
+            height: 50
+        Button:
+            id: hamburger_button
+            text: ''
+            size_hint_y: None
+            height: 50
+            on_press: root.toggle_hamburger()
+
+<PortfolioScreen>:
+    BoxLayout:
+        orientation: 'vertical'
+        padding: 10
+        spacing: 10
+        ButtonStyle:
+            text: 'Portfolio Screen'
+            size_hint_y: None
+            height: 50
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint_y: None
+            height: 50
+            spacing: 10
+            Button:
+                id: line1
+                size_hint_y: None
+                height: 5
+                background_normal: ''
+                background_color: 0, 0, 0, 1
+            Button:
+                id: line2
+                size_hint_y: None
+                height: 5
+                background_normal: ''
+                background_color: 0, 0, 0, 1
+            Button:
+                id: line3
+                size_hint_y: None
+                height: 5
+                background_normal: ''
+                background_color: 0, 0, 0, 1
