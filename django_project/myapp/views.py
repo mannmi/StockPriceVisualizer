@@ -1,11 +1,4 @@
-import os
-import sys
-
-from django.shortcuts import render
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
-
-
-# Create your views here.
+import pandas as pd
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -31,6 +24,7 @@ class YahooRunner:
         return tickers_list
 
     def update_watch_list(self, tickers):
+        print(tickers)
         ticker_list = self.db_manager.get_ticker_list()
         self.db_manager.fetch_and_store_data(ticker_list, self.api_key_Load)
 
@@ -80,14 +74,12 @@ class GetTickers(APIView):
     def get(self, request):
         watcher = request.query_params.get('watcher', 'true').lower() == 'true'
         tickers_list = runner.get_tickers(watcher)
-        serializer = TickerSerializer(tickers_list, many=True)
-        return Response(serializer.data)
+        return Response(tickers_list.to_dict(orient='records'))
 
 class GetWatchedListAll(APIView):
     def get(self, request):
         tickers_list = runner.get_watched_list_all()
-        serializer = TickerSerializer(tickers_list, many=True)
-        return Response(serializer.data)
+        return Response(tickers_list.to_dict(orient='records'))
 
 class UpdateWatchList(APIView):
     def post(self, request):
@@ -121,8 +113,7 @@ class StoreTickerList(APIView):
 class GetAllTickersFile(APIView):
     def get(self, request):
         tickers_list = runner.get_all_tickers_file()
-        serializer = TickerSerializer(tickers_list, many=True)
-        return Response(serializer.data)
+        return Response(tickers_list.to_dict(orient='records'))
 
 class LoadData(APIView):
     def post(self, request):
@@ -134,11 +125,10 @@ class PlotGraph(APIView):
     def post(self, request):
         all_data = request.data.get('all_data')
         chunk_size = request.data.get('chunk_size', 1000)
-        fig, config = runner.plotGraph(all_data, chunk_size)
+        fig, config = runner.plotGraph(pd.DataFrame(all_data), chunk_size)
         return Response({'fig': fig, 'config': config})
 
 class GetTickersFromVariable(APIView):
     def get(self, request):
         tickers_list = runner.get_tickers_from_variable()
-        serializer = TickerSerializer(tickers_list, many=True)
-        return Response(serializer.data)
+        return Response(tickers_list.to_dict(orient='records'))
