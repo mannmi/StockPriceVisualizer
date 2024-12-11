@@ -13,7 +13,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 import os
 import sys
 
-
+import logging.config
 
 # Add the src directory to the Python path
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..'))
@@ -24,22 +24,20 @@ from src.config_loader.configLoader import Yml_Loader
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-y8mj^eqhbs=1yeiz!*mwela@k5gui(0vcyon7jkm+ca341)zdv'
 
-#load Data
-cpath=r"C:\Users\mannnmi\CryptoPrediction\docker-compose.yml"
+# load Data
+cpath = r"C:\Users\mannnmi\CryptoPrediction\docker-compose.yml"
 docker_config = Yml_Loader(cpath)
 dbConf = docker_config.data['services']['db']['environment']
 user = dbConf['MYSQL_USER']
 password = dbConf['MYSQL_PASSWORD']
 database = dbConf['MYSQL_DATABASE']
-print("Not running inside a Docker container")
-#todo change to ip where the server is setup :) may have to move this to a config at somme stage (this is a dirty implementation)
+# todo change to ip where the server is setup :) may have to move this to a config at somme stage (this is a dirty implementation)
 host = "127.0.0.1"
 
 hostPort, containerPort = docker_config.data['services']['db']['ports'][0].split(':')
@@ -49,8 +47,39 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-
 # Application definition
+
+# This was copied from the folowing source on the (11/12/2024)
+# source https://stackoverflow.com/questions/60845876/django-logging-not-printing-to-console-and-file
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+    },
+    'loggers': {
+        'django': {
+            'level': 'INFO',
+            'handlers': ['console'],
+            'propagate': False,
+        },
+        '': {
+            'level': 'INFO',
+            'handlers': ['console'],
+        },
+    },
+}
+
+logging.config.dictConfig(LOGGING)
+
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -93,12 +122,11 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'django_project.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 
-#todo add diffrent user (use code from TPRO To load data from a config which then generates new users for django :)
+# todo add diffrent user (use code from TPRO To load data from a config which then generates new users for django :)
 #   This makese i posbile to add users through config. Each task schould have seperate user and permissions :)
 DATABASES = {
     'default': {
@@ -110,7 +138,6 @@ DATABASES = {
         'PORT': hostPort,
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
@@ -130,7 +157,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 
@@ -142,7 +168,6 @@ USE_I18N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
@@ -152,3 +177,4 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+

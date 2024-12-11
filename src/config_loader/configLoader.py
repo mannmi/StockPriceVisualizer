@@ -86,8 +86,8 @@ class Yml_Loader:
         # Start at the current directory
         path = os.getcwd()
 
-        # Keep going up until we find the main.py file
-        while not os.path.isfile(os.path.join(path, 'main.py')):
+        # Keep going up until we find the appDemoAsync.py file
+        while not os.path.isfile(os.path.join(path, 'appDemoAsync.py')):
             new_path = os.path.dirname(path)
             if new_path == path:
                 # We've reached the root of the filesystem, so the project root was not found

@@ -5,7 +5,9 @@ from plotly.graph_objs import FigureWidget
 
 import ipywidgets as widgets
 
-print(widgets.__version__)
+from src.logging.logging_config import logger
+
+logger.info(widgets.__version__)
 
 from PyQt6.QtWidgets import QMainWindow, QVBoxLayout, QWidget
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas

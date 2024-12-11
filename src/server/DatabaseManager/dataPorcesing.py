@@ -7,6 +7,7 @@ from datetime import timedelta
 
 import requests
 
+from src.logging.logging_config import logger
 #sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '/app/src/')))
 from src.marketCheck.marketCheck import marketTimeChecker
 from src.server.yahoo.fetchYahoo import DataFetcher
@@ -41,26 +42,26 @@ class DataProcessor:
     def read_all_tickers_from_file(self):
         file_path = self.tickerFilePath
         if os.path.getsize(file_path) == 0:
-            print("The file is empty.")
+            logger.debug("The file is empty.")
             exit()
         else:
             data = pd.read_csv(file_path)
-            print("Data read successfully.")
+            logger.info("Data read successfully.")
 
         # Save the CSV data to a file
         with open(file_path, 'r') as file:
             content = file.read()
-            print("File content:\n", content)
+            logger.info("File content:\n", content)
             data = pd.read_csv(file_path)
         return data
 
     def strip_empty_lines(self):
         file_path = self.tickerFilePath
         if os.path.getsize(file_path) == 0:
-            print("The file is empty.")
+            logger.debug("The file is empty.")
         else:
             data = pd.read_csv(file_path)
-            print("Data read successfully.")
+            logger.info("Data read successfully.")
 
         with open(file_path, 'r') as file:
             lines = file.readlines()
@@ -87,5 +88,5 @@ class DataProcessor:
             plt.grid(True)
             plt.show()
         else:
-            print("No data to plot. Data Procesing")
+            logger.info("No data to plot. Data Procesing")
 

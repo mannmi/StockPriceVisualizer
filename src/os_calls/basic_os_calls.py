@@ -7,6 +7,10 @@ from time import sleep
 
 
 def clear():
+    """
+    clears the screen windows or linux
+    :return: no return
+    """
     # for windows
     if name == 'nt':
         _ = system('cls')
@@ -16,6 +20,10 @@ def clear():
 
 
 def is_running_in_docker():
+    """
+    checks if its running docker path may differ between docker and non docker
+    :return:
+    """
     # Check for the presence of the Docker environment file
     if os.path.exists('/.dockerenv'):
         return True

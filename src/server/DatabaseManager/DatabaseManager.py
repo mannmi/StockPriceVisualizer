@@ -9,6 +9,7 @@ import yaml
 # Add the /app directory to sys.path
 # sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
 from src.config_loader.configLoader import Yml_Loader
+from src.logging.logging_config import logger
 from src.os_calls.basic_os_calls import is_running_in_docker
 
 
@@ -27,7 +28,7 @@ class DatabaseManager:
         # self.docker_config = Yml_Loader(cpath)
         if self.docker_config.data is None:
             raise ValueError("Config not loaded Properly")
-        print(self.docker_config.data)
+        logger.info(self.docker_config.data)
 
         dbConf = self.docker_config.data['services']['db']['environment']
         self.user = dbConf['MYSQL_USER']
@@ -37,7 +38,7 @@ class DatabaseManager:
         if is_running_in_docker():
             self.host = "db"
         else:
-            print("Not running inside a Docker container")
+            logger.info("Not running inside a Docker container")
             self.host = "127.0.0.1"
 
         hostPort, containerPort = self.docker_config.data['services']['db']['ports'][0].split(':')
@@ -107,7 +108,30 @@ class DatabaseManager:
         ''')
         self.conn.commit()
         self.close()
-        print("Database setup complete.")
+        logger.debug("Database setup complete.")
+
+    def get_max_timestamp(self, symbol):
+        self.connect()
+        try:
+            self.cursor.execute('''SELECT MAX(timestamp) AS max_timestamp
+                                     FROM prices
+                                     WHERE symbol_id = %s''', (symbol,))
+            result = self.cursor.fetchone()
+
+            logger.info(f"Query result: {result} for newest database date {symbol}")
+        except Exception as e:
+            logger.error(f"An error occurred in get_max_timestamp: {e}")
+            result = 0  # Return 0 in case of error
+        finally:
+            self.close()
+
+        # Check if result is None and set it to 0 if it is
+        if result is None or result[0] is None:
+            result = 0  # The data has not been added yet, we need to start from scratch
+        else:
+            result = result[0]
+
+        return result
 
     def get_ticker_list(self, watcher_only=True):
         result = []
@@ -130,7 +154,7 @@ class DatabaseManager:
             if not watcher_only:
                 self.ticker_list_Storage = result
         except Exception as e:
-            print(f"An error occurred: {e}")
+            logger.error(f"An error occurred: {e}")
             result = pd.DataFrame()  # Return an empty DataFrame in case of error
         finally:
             self.close()
@@ -146,12 +170,12 @@ class DatabaseManager:
             ''', (symbol,))
             self.conn.commit()
         except Exception as e:
-            print(f"An error occurred get_watcher_list: {e}")
+            logger.error(f"An error occurred get_watcher_list: {e}")
         finally:
             self.close()
 
     def remove_from_watcher_list(self, symbol):
-        print("remove from watcher list")
+        logger.info("remove from watcher list")
         self.connect()
         try:
             self.cursor.execute('''
@@ -161,7 +185,7 @@ class DatabaseManager:
                ''', (symbol,))
             self.conn.commit()
         except Exception as e:
-            print(f"An error occurred remove_from_watcher_list: {e}")
+            logger.error("An error occurred remove_from_watcher_list: {e}")
         finally:
             self.close()
 

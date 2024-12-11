@@ -4,6 +4,7 @@ import plotly.graph_objs as go
 import plotly.express as px
 
 from DatabaseManager import fetch_and_store_data
+from src.logging.logging_config import logger
 from src.server.DatabaseManager import DatabaseManager
 
 # # Fetch data from Alpha Vantage
@@ -42,4 +43,4 @@ DatabaseManager = DatabaseManager(config)
 DatabaseManager.fetch_and_store_data(tickers,trade_api)
 
 while True:
-    print("yesterday")
+    logger.info("yesterday")

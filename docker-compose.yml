@@ -1,7 +1,7 @@
 services:
   python_app:
     build: .
-    command: /bin/sh -c "python main.py && sleep infinity || sleep infinity"
+    command: /bin/sh -c "python appDemoAsync.py && sleep infinity || sleep infinity"
     volumes:
       - ./src/server:/app/server
       - ./src/config_loader:/app/config_loader
@@ -46,7 +46,7 @@ services:
     build: .
     environment:
       - DISPLAY=${DISPLAY}
-    command: /bin/sh -c "python main.py && sleep infinity || sleep infinity"
+    command: /bin/sh -c "python appDemoAsync.py && sleep infinity || sleep infinity"
     container_name: qt-gui-app
     volumes:
       - ./src/server:/app/server

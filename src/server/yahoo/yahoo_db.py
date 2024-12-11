@@ -5,12 +5,13 @@ from numpy.f2py.auxfuncs import throw_error
 
 # config.yml
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '/app/')))
+from src.logging.logging_config import logger
 from src.server.DatabaseManager.DatabaseManager import DatabaseManager
 from src.config_loader.configLoader import Yml_Loader
 from src.server.yahoo.dataProcesingYahoo import DataProcessorYahoo
 from src.os_calls.basic_os_calls import clear
 
-print("MySQL Connector is installed and working!")
+logger.info("MySQL Connector is installed and working!")
 
 
 class Yahoo(DatabaseManager):
@@ -36,7 +37,7 @@ class Yahoo(DatabaseManager):
         symbol = str(symbol)  # Ensure symbol is a string
 
         # Print column names to verify 'Datetime' exists
-        print("Columns in DataFrame:", df.columns)
+        logger.info("Columns in DataFrame:", df.columns)
 
         # Ensure Datetime column is in datetime format
         if ('Datetime', '') in df.columns:
@@ -59,18 +60,10 @@ class Yahoo(DatabaseManager):
                     ('Volume', 'A')]
                 # end of chatgbt generated fix
 
-                print(type(datetime_value), datetime_value)
-                print(type(open_value), open_value)
-                print(type(high_value), high_value)
-                print(type(low_value), low_value)
-                print(type(close_value), close_value)
-                print(type(volume_value), volume_value)
-
                 self.cursor.execute('''
                     SELECT COUNT(*) FROM prices WHERE symbol_id = %s AND timestamp = %s
                 ''', (symbol_id, datetime_value))
                 count = self.cursor.fetchone()[0]
-                print("yes")
 
                 if count == 0:
                     self.cursor.execute('''
@@ -82,10 +75,10 @@ class Yahoo(DatabaseManager):
 
             self.conn.commit()
         else:
-            print("Error: 'Datetime' column not found in DataFrame")
+            logger.error("Error: 'Datetime' column not found in DataFrame")
 
         self.close()
-        print(f"Data for {symbol} has been stored in the database.")
+        logger.info(f"Data for {symbol} has been stored in the database.")
 
     # Fetch and store data for multiple tickers
     def fetch_and_store_symbol(self, tickers, api_key):
@@ -98,13 +91,14 @@ class Yahoo(DatabaseManager):
             try:
                 self.update_symbol(ticker)
             except Exception as e:
-                print(f"An error occurred for {ticker}: {e}")
+                logger.error(f"An error occurred for {ticker}: {e}")
 
-    def fetch_and_store_data(self, tickers, api_key):
+    def fetch_and_store_data(self, tickers,api_key, fetch_recent=True ):
         try:
             watcher_list = self.get_ticker_list()
         except Exception as e:
-            print(f"An error occurred : {e}")
+            logger.error(f"An error occurred : {e}")
+            return
 
         if tickers.empty:
             raise ValueError("The list of tickers is empty. Please provide at least one ticker symbol.")
@@ -112,13 +106,22 @@ class Yahoo(DatabaseManager):
         DataProcessorVar = DataProcessorYahoo(tickers, self.tickerFilePath)
         for index, ticker in watcher_list.iterrows():
             DataProcessorVar.ticker = ticker["symbol"]
-            data_store = DataProcessorVar.process_data()
-            print(data_store.columns.tolist())
-            self.store_data(ticker, data_store)
+            timestamp=0
+            if(fetch_recent):
+                timestamp = self.get_max_timestamp(ticker["symbol"])
+                #exit()
+            if(timestamp is not None):
+                logger.info(f"Get Data in {timestamp}")
+                data_store = DataProcessorVar.process_data(timestamp)
+                if data_store is not None:
+                    logger.info(data_store.columns.tolist())
+                    self.store_data(ticker, data_store)
+
 
 
 # Example usage
 if __name__ == "__main__":
+    logger.info("starting the run")
     api_key_Load = 'your_api_key_here'  # Replace with your actual API key
     docker_config = '/app/docker-compose.yml'
     config_path = "/app/config_loader/config.yml"
@@ -129,13 +132,6 @@ if __name__ == "__main__":
     dataProcessor.strip_empty_lines()
 
     tickers_list = dataProcessor.read_all_tickers_from_file()
-
-
-
-    # print(tickers_list[0])
-    for index, ticker in tickers_list.iterrows():
-        print(type(ticker))
-        print(ticker)
 
     # print(tickers_list)
 
@@ -149,7 +145,8 @@ if __name__ == "__main__":
     # db_manager.add_to_watcher_list("AMD")
     # db_manager.add_to_watcher_list("A")
 
-    #tickers_list = db_manager.get_ticker_list()
-    db_manager.fetch_and_store_symbol(tickers_list,0)
+    # tickers_list = db_manager.get_ticker_list()
+    #db_manager.fetch_and_store_symbol(tickers_list, 0)
+    ticker_list = db_manager.get_ticker_list()
 
-    db_manager.fetch_and_store_data(tickers_list, api_key_Load)
+    db_manager.fetch_and_store_data(tickers_list, api_key_Load,False)
