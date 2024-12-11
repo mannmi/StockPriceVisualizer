@@ -9,7 +9,7 @@ System:
   delimiter: ;
   encoding: utf-8
   lineterminator: \n
-  projectRoot_file: main.py
+  projectRoot_file: appDemoAsync.py
 acceskeys:
   HUGGINGFACE_TOKEN: hf_testtoken
 bertModel:

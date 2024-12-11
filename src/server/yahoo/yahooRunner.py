@@ -1,6 +1,8 @@
 import os
 import sys
 
+from src.logging.logging_config import logger
+
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '/app/')))
 
 from src.server.DatabaseManager.runner import Runner
@@ -28,17 +30,21 @@ class yahooRunner(Runner):
         tickers_list = self.db_manager.get_ticker_list()
         return tickers_list
 
-    def update_watch_list(self, tickers):
+    def full_update_watch_list(self, tickers):
         #print("todo")
         ticker_list = self.db_manager.get_ticker_list()
         self.db_manager.fetch_and_store_data(ticker_list, self.api_key_Load)
 
+    def update_watch_list(self, tickers):
+        ticker_list = self.db_manager.get_ticker_list()
+        self.db_manager.fetch_and_store_data(ticker_list, self.api_key_Load)
+
     def add_to_watch_list(self, tickers):
-        print("add_to_watch_list")
+        logger.info("add_to_watch_list")
         self.db_manager.add_to_watcher_list(tickers)
 
     def remove_from_watch_list(self, tickers):
-        print("remove_from_watch_list")
+        logger.info("remove_from_watch_list")
         self.db_manager.remove_from_watcher_list(tickers)
 
     def update_ticker_list(self):
@@ -48,9 +54,9 @@ class yahooRunner(Runner):
 
     def store_ticker_list(self, tickers):
         tickers_list = self.get_all_tickers_file()
-        print(tickers_list)
-        api_key_Load = self.api_key_Load  # todo remove this line ? not realy used at the moment with yahoo
-        self.db_manager.fetch_and_store_symbol(tickers_list, api_key_Load)
+        logger.info(tickers_list)
+        # todo remove this line ? not realy used at the moment with yahoo
+        self.db_manager.fetch_and_store_symbol(tickers_list, self.api_key_Load)
 
     def get_all_tickers_file(self):
         self.ticker_list = self.dataProcessor.read_all_tickers_from_file()
@@ -72,10 +78,14 @@ class yahooRunner(Runner):
         self.ticker_list = self.db_manager.ticker_list_Storage
         if self.ticker_list.empty:
              self.ticker_list = self.db_manager.get_ticker_list(False)
-             print("It was empty")
+             logger.debug("It was empty")
+        return self.ticker_list
+
+    def get_tickers_from_db(self):
+        self.ticker_list = self.db_manager.get_ticker_list(False)
         return self.ticker_list
 
 
 # Example usage
 if __name__ == "__main__":
-    print("yahooRunner")
+    logger.info("yahooRunner")

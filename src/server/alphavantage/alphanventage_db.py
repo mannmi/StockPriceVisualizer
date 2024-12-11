@@ -4,7 +4,7 @@ import sys
 import pandas as pd
 import requests
 
-
+from src.logging.logging_config import logger
 #sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
 from src.server.DatabaseManager.DatabaseManager import DatabaseManager
 
@@ -13,7 +13,7 @@ from src.server.DatabaseManager.DatabaseManager import DatabaseManager
 
 from src.config_loader.configLoader import Yml_Loader
 
-print("MySQL Connector is installed and working!")
+logger.info("MySQL Connector is installed and working!")
 
 
 class AlphaEvent(DatabaseManager):
@@ -37,7 +37,7 @@ class AlphaEvent(DatabaseManager):
                 ''', (symbol_id, index, row['1. open'], row['2. high'], row['3. low'], row['4. close'], row['5. volume']))
         self.conn.commit()
         self.close()
-        print(f"Data for {symbol} has been stored in the database.")
+        logger.info(f"Data for {symbol} has been stored in the database.")
 
     #no api on yaho to do this :)
     def fetch_all_tickers(api_key):
@@ -77,7 +77,7 @@ class AlphaEvent(DatabaseManager):
                 data = response.json()
 
                 # Debugging: Print the response to check its structure
-                print(f"Response for {ticker}: {data}")
+                logger.info(f"Response for {ticker}: {data}")
 
                 # Check if 'Time Series (1min)' is in the response
                 # If not then this may be one of the error messages :)

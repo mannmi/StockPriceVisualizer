@@ -72,6 +72,7 @@ ACET,Adicet Bio Inc,NASDAQ,Stock,2018-01-26,null,Active
 ACGL,Arch Capital Group Ltd,NASDAQ,Stock,1995-09-14,null,Active
 ACGLN,Arch Capital Group Ltd,NASDAQ,Stock,2021-06-03,null,Active
 ACGLO,Arch Capital Group Ltd,NASDAQ,Stock,2017-08-15,null,Active
+ACGR,American Century Large Cap Growth ETF,NYSE ARCA,ETF,2020-01-21,null,Active
 ACHC,Acadia Healthcare Company Inc,NASDAQ,Stock,1994-03-04,null,Active
 ACHL,Achilles Therapeutics Plc,NASDAQ,Stock,2021-03-31,null,Active
 ACHR,Archer Aviation Inc - Class A,NYSE,Stock,2020-12-18,null,Active
@@ -82,6 +83,7 @@ ACIC,American Coastal Insurance Corp,NASDAQ,Stock,2007-11-07,null,Active
 ACIO,APTUS COLLARED INVESTMENT OPPORTUNITY ETF ,BATS,ETF,2019-07-10,null,Active
 ACIU,AC Immune SA,NASDAQ,Stock,2016-09-23,null,Active
 ACIW,ACI Worldwide Inc,NASDAQ,Stock,1995-02-27,null,Active
+ACLC,American Century Sustainable Equity ETF,NYSE ARCA,ETF,2020-07-15,null,Active
 ACLO,ACCELIO CORP,NASDAQ,Stock,2024-11-18,null,Active
 ACLS,Axcelis Technologies Inc,NASDAQ,Stock,2000-07-11,null,Active
 ACLX,Arcellx Inc,NASDAQ,Stock,2022-02-04,null,Active
@@ -2506,7 +2508,7 @@ CVY,Invesco Zacks Multi-Asset Income ETF,NYSE ARCA,ETF,2006-09-21,null,Active
 CW,Curtiss-Wright Corp,NYSE,Stock,1987-11-05,null,Active
 CWAN,Clearwater Analytics Holdings Inc Class A,NYSE,Stock,2021-09-24,null,Active
 CWB,SPDR(R) BLOOMBERG CONVERTIBLE SECURITIES ETF ,NYSE ARCA,ETF,2009-04-16,null,Active
-CWBC,Community West Bancshares,NASDAQ,Stock,1996-11-19,null,Active
+CWBC,Community West Bancshares.,NASDAQ,Stock,1999-03-08,null,Active
 CWCO,Consolidated Water Co. Ltd,NASDAQ,Stock,1995-06-01,null,Active
 CWD,CaliberCos Inc - Class A,NASDAQ,Stock,2023-05-17,null,Active
 CWEB,DIREXION DAILY CSI CHINA INTERNET INDEX BULL 2X SHARES ,NYSE ARCA,ETF,2016-11-02,null,Active
@@ -3373,7 +3375,6 @@ ESCA,Escalade Inc,NASDAQ,Stock,1992-02-25,null,Active
 ESE,Esco Technologies Inc,NYSE,Stock,1990-10-01,null,Active
 ESEA,Euroseas Ltd,NASDAQ,Stock,2006-05-05,null,Active
 ESG,FLEXSHARES STOXX US ESG SELECT INDEX FUND ,BATS,ETF,2016-07-14,null,Active
-ESGA,AMERICAN CENTURY SUSTAINABLE EQUITY ETF ,NYSE ARCA,ETF,2020-07-15,null,Active
 ESGD,ISHARES ESG AWARE MSCI EAFE ETF ,NASDAQ,ETF,2016-06-30,null,Active
 ESGE,ISHARES ESG AWARE MSCI EM ETF ,NASDAQ,ETF,2016-07-20,null,Active
 ESGG,FLEXSHARES STOXX GLOBAL ESG SELECT INDEX FUND ,BATS,ETF,2016-07-14,null,Active
@@ -3385,7 +3386,6 @@ ESGRP,Enstar Group Ltd,NASDAQ,Stock,2018-06-20,null,Active
 ESGU,ISHARES ESG AWARE MSCI USA ETF ,NASDAQ,ETF,2016-12-06,null,Active
 ESGV,VANGUARD ESG U.S. STOCK ETF ETF SHARES,BATS,ETF,2018-09-20,null,Active
 ESGX,Tuttle Capital Shareholders First Index ETF,BATS,ETF,2024-09-10,null,Active
-ESGY,AMERICAN CENTURY SUSTAINABLE GROWTH ETF ,NYSE ARCA,ETF,2020-01-21,null,Active
 ESHA,ESH Acquisition Corp - Class A,NASDAQ,Stock,2023-07-21,null,Active
 ESHAR,ESH Acquisition Corp,NASDAQ,Stock,2023-07-21,null,Active
 ESI,Element Solutions Inc,NYSE,Stock,2013-10-22,null,Active
@@ -5714,6 +5714,7 @@ J,Jacobs Solutions Inc,NYSE,Stock,1990-01-12,null,Active
 J-W,Jacobs Solutions Inc WhenIssued,NYSE,Stock,2024-09-26,null,Active
 JAAA,JANUS HENDERSON AAA CLO ETF ,NYSE ARCA,ETF,2020-10-19,null,Active
 JACK,Jack In The Box Inc,NASDAQ,Stock,1992-03-05,null,Active
+JACS-U,Jackson Acquisition Company II - Units (1 Ord Cls A & 1 Rts),NYSE,Stock,2024-12-10,null,Active
 JADE,JPMorgan Active Developing Markets Equity ETF,NYSE ARCA,ETF,2024-05-17,null,Active
 JAGX,Jaguar Health Inc,NASDAQ,Stock,2015-05-13,null,Active
 JAJL,Innovator Equity Defined Protection ETF - 6mo Jan/Jul,BATS,ETF,2024-07-01,null,Active
@@ -6574,6 +6575,7 @@ MAR,Marriott International Inc - Class A,NASDAQ,Stock,1993-10-13,null,Active
 MARA,Marathon Digital Holdings Inc,NASDAQ,Stock,2012-05-04,null,Active
 MARB,FIRST TRUST MERGER ARBITRAGE ETF ,NYSE ARCA,ETF,2020-02-05,null,Active
 MARM,FT VEST U.S. EQUITY MAX BUFFER ETF - MARCH ,BATS,ETF,2024-03-27,null,Active
+MARO,Tidal Trust II YieldMax MARA Option Income Strategy,NYSE ARCA,Stock,2024-12-10,null,Active
 MARPS,Marine Petroleum Trust,NASDAQ,Stock,1995-08-18,null,Active
 MART,ALLIANZIM U.S. LARGE CAP BUFFER10 MAR ETF ,NYSE ARCA,ETF,2023-03-01,null,Active
 MARW,ALLIANZIM U.S. LARGE CAP BUFFER20 MAR ETF ,NYSE ARCA,ETF,2023-03-01,null,Active
@@ -8902,6 +8904,7 @@ RFFC,ALPS ACTIVE EQUITY OPPORTUNITY ETF ,NYSE ARCA,ETF,2016-06-07,null,Active
 RFG,Invesco S&P MidCap 400 Pure Growth ETF,NYSE ARCA,ETF,2006-03-07,null,Active
 RFI,Cohen & Steers Total Return Realty Fund Inc,NYSE,ETF,1994-10-27,null,Active
 RFIL,RF Industries Ltd,NASDAQ,Stock,1997-05-28,null,Active
+RFIX,Simplify Downside Interest Rate Hedge Strategy ETF,NYSE ARCA,Stock,2024-12-10,null,Active
 RFL,Rafael Holdings Inc - Class B,NYSE,Stock,2018-03-26,null,Active
 RFLR,Innovator U.S. Small Cap Managed Floor ETF,NYSE ARCA,ETF,2024-09-17,null,Active
 RFM,RiverNorth Flexible Municipal Income Fund Inc,NYSE,Stock,2020-03-27,null,Active
@@ -9491,7 +9494,7 @@ SHO-P-I,Sunstone Hotel Investors Inc,NYSE,Stock,2021-07-20,null,Active
 SHOC,STRIVE U.S. SEMICONDUCTOR ETF ,NYSE ARCA,ETF,2022-10-06,null,Active
 SHOO,Steven Madden Ltd,NASDAQ,Stock,1993-12-13,null,Active
 SHOP,Shopify Inc - Class A,NYSE,Stock,2015-05-21,null,Active
-SHOT,Safety Shot Inc,NASDAQ,Stock,2020-10-30,null,Active
+SHOT,Safety Shot Inc Com,NASDAQ,Stock,2023-09-15,null,Active
 SHOTW,Safety Shot Inc Wt Exp,NASDAQ,Stock,2023-09-15,null,Active
 SHPH,Shuttle Pharmaceuticals Holdings Inc,NASDAQ,Stock,2022-08-31,null,Active
 SHPP,PACER INDUSTRIALS AND LOGISTICS ETF ,NYSE ARCA,ETF,2022-06-09,null,Active
@@ -10205,7 +10208,6 @@ TCOM,Trip.com Group Ltd,NASDAQ,Stock,2003-12-09,null,Active
 TCPC,BlackRock TCP Capital Corp,NASDAQ,Stock,2012-04-04,null,Active
 TCRT,Alaunos Therapeutics Inc,NASDAQ,Stock,2005-08-24,null,Active
 TCRX,Tscan Therapeutics Inc,NASDAQ,Stock,2021-07-16,null,Active
-TCS,Container Store Group Inc,NYSE,Stock,2013-11-01,null,Active
 TCTM,Tarena International Inc,NASDAQ,Stock,2014-04-03,null,Active
 TCVA,TCV Acquisition Corp - Class A,NASDAQ,Stock,2021-04-14,null,Active
 TCX,Tucows Inc - Class A,NASDAQ,Stock,1996-04-30,null,Active
@@ -10565,7 +10567,7 @@ TTE,TotalEnergies SE,NYSE,Stock,1991-10-25,null,Active
 TTEC,TTEC Holdings Inc,NASDAQ,Stock,1996-08-01,null,Active
 TTEK,Tetra Tech Inc,NASDAQ,Stock,1991-12-17,null,Active
 TTEQ,T. Rowe Price Technology ETF,NASDAQ,ETF,2024-10-24,null,Active
-TTGT,Techtarget Inc,NASDAQ,Stock,2024-12-03,null,Active
+TTGT,Techtarget Inc,NASDAQ,Stock,2007-05-17,null,Active
 TTI,Tetra Technologies Inc,NYSE,Stock,1990-04-03,null,Active
 TTMI,TTM Technologies Inc,NASDAQ,Stock,2000-09-25,null,Active
 TTNP,Titan Pharmaceuticals Inc (de),NASDAQ,Stock,2006-12-28,null,Active

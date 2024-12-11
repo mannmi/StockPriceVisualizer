@@ -1,5 +1,8 @@
 from django.urls import path
-from .views import GetTickers, GetWatchedListAll, UpdateWatchList, AddToWatchList, RemoveFromWatchList, UpdateTickerList, StoreTickerList, GetAllTickersFile, LoadData, PlotGraph, GetTickersFromVariable
+
+from .views import GetTickers, GetWatchedListAll, UpdateWatchList, AddToWatchList, RemoveFromWatchList, \
+    UpdateTickerList, StoreTickerList, GetAllTickersFile, LoadData, PlotGraph, GetTickersFromVariable, GetTickersFromDB, \
+    GetLoger
 
 urlpatterns = [
     path('get_tickers/', GetTickers.as_view(), name='get_tickers'),
@@ -13,4 +16,8 @@ urlpatterns = [
     path('load_data/', LoadData.as_view(), name='load_data'),
     path('plot_graph/', PlotGraph.as_view(), name='plot_graph'),
     path('get_tickers_from_variable/', GetTickersFromVariable.as_view(), name='get_tickers_from_variable'),
+    path('get_tickers_from_db/', GetTickersFromDB.as_view(), name='get_tickers_from_db'),
+    path('test-logging/', GetLoger.as_view(), name='test_logging_view'),
+
+
 ]

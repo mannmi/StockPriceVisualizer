@@ -26,7 +26,7 @@ class Test_yml_Loader(unittest.TestCase):
         print(f"Running test ====> {self._testMethodName}")
         dataRead = self.ymlLoader.data
         refString = {'System': {'ProjectRoot': 'F:\\PycharmProjects\\TPRO', 'chunksize': '10 ** 1', 'delimiter': ';',
-                                'encoding': 'utf-8', 'lineterminator': '\\n', 'projectRoot_file': 'main.py'},
+                                'encoding': 'utf-8', 'lineterminator': '\\n', 'projectRoot_file': 'appDemoAsync.py'},
                      'acceskeys': {'HUGGINGFACE_TOKEN': 'hf_testtoken'}, 'bertModel': [
                 {'filter': {'model_name': 'unitary/unbiased-toxic-roberta', 'model_path': '/models/filtration_model'}}],
                      'combinedModel': {

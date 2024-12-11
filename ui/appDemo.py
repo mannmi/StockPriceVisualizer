@@ -16,6 +16,7 @@ from PyQt6.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QTe
     QCheckBox, QComboBox, QLineEdit, QLabel, QHBoxLayout, QProgressBar, QDialog, QMenu, QMenuBar
 from torchvision.transforms.v2.functional import vertical_flip_video
 
+from src.logging.logging_config import logger
 # from src.backup.fetch_data import ticker
 from src.server.yahoo.yahooRunner import yahooRunner
 from ui.PlotWindow import PlotWindow
@@ -154,7 +155,7 @@ class AppDemo(QWidget):
 
     def toggle_table_visibility(self, visible):
         self.table.setVisible(visible)
-        print(f"Table visibility set to {visible}")
+        logger.info(f"Table visibility set to {visible}")
 
     def add_filter_row(self):
         filter_row = QHBoxLayout()
@@ -196,8 +197,8 @@ class AppDemo(QWidget):
         all_data = self.runner.load_data(row)
         fig, config = self.runner.plotGraph(all_data, chunk_size=1000)
         if fig is None:
-            print("No data to plot.")
-            print(fig, config)
+            logger.info("No data to plot.")
+            logger.debug(fig, config)
             return
 
         app = QApplication.instance()
@@ -267,10 +268,10 @@ class AppDemo(QWidget):
             new_status = 1
 
         row['watching'] = new_status
-        print(f"Updated row {row['symbol']} watching status to {new_status}")
+        logger.info(f"Updated row {row['symbol']} watching status to {new_status}")
 
     def update_watch_list(self):
-        print("todo")
+        logger.info("todo")
         self.runner.update_watch_list("A")
 
     def update_ticker_list(self):

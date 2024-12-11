@@ -16,12 +16,26 @@ class marketTimeChecker:
         self.market_tz = pytz.timezone(market_tz)
 
     def get_current_time(self):
+        """
+        get the curent time for the curently set time zone. The time zone is curently set to Soul Asia
+        #todo implment beter locaisation
+        :return: localized time
+        """
         return datetime.now(self.local_tz)
 
     def convert_to_market_time(self, local_time):
+        """
+        yahoo is based in the usa the stock prices will be based on the us market
+        :param local_time: provide your curent time (curently set in Seoul time)
+        :return: the yahooo time zone based time stamp
+        """
         return local_time.astimezone(self.market_tz)
 
     def is_market_open(self):
+        """
+        check if market is up. Historical Data schould not be fetched if its up
+        :return:
+        """
         now_local = self.get_current_time()
         now_market = self.convert_to_market_time(now_local)
 
@@ -30,14 +44,3 @@ class marketTimeChecker:
 
         return market_open <= now_market <= market_close
 
-    def check_market_status_open(self):
-        if self.is_market_open():
-            return True
-        else:
-            return False
-
-
-# Example usage
-# checker = marketTimeChecker()
-# status = checker.check_market_status_open()
-# print(status)

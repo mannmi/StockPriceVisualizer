@@ -8,6 +8,8 @@ import pandas as pd
 from matplotlib.figure import Figure
 from matplotlib.widgets import RectangleSelector  # Import RectangleSelector
 
+from src.logging.logging_config import logger
+
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '/app/')))
 from src.marketCheck.marketCheck import marketTimeChecker
 from src.server.yahoo.fetchYahoo import DataFetcher
@@ -21,20 +23,27 @@ class DataProcessorYahoo(DataProcessor):
         self.tickerList = self.read_all_tickers_from_file()
         self.all_data = []
 
-    def process_data(self):
+    def process_data(self, start_date=0):
+        #todo when it gose life only fetch historical data when the markets are "down"
         market_checker = marketTimeChecker()
         fetcher = DataFetcher(self.ticker)
-        print(self.ticker)
+        logger.info(self.ticker)
 
-        days_to_go_back, ticker_first_updated, ticker_last_updated = fetcher.fetch_active_period()
-        days_to_go_back_total = days_to_go_back // 1000
+
+        days_to_go_back, ticker_first_updated, ticker_last_updated = fetcher.fetch_active_period(start_date)
+        #logger.info("output=> ",start_date, days_to_go_back, ticker_first_updated, ticker_last_updated )
+        if days_to_go_back == None and ticker_first_updated == None and ticker_last_updated == None:
+            return None
+        if days_to_go_back <= 0:
+            logger.info("no changes detected")
+            return
+        days_to_go_back_total = days_to_go_back
         days_to_go_back = days_to_go_back_total
 
         local_time = market_checker.get_current_time()
         end_date = market_checker.convert_to_market_time(local_time)
 
         days_passed = 0
-
         while days_to_go_back > 0:
             if days_passed >= 60:
                 interval = '1d'
@@ -94,10 +103,10 @@ class DataProcessorYahoo(DataProcessor):
 
     def plot_data(self, chunk_size=1000):
         if self.all_data.empty:
-            print("It's empty")
+            logger.error("It's empty")
             return None, None
 
-        print(self.all_data)
+        logger.info(self.all_data)
 
         # Convert all timestamps to timezone-naive
         self.all_data['timestamp'] = pd.to_datetime(self.all_data['timestamp'])

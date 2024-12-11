@@ -46,6 +46,6 @@ COPY docker-compose.yml .
 # Make port 5000 available to the world outside this container
 EXPOSE 5000
 
-# Run main.py when the container launches
+# Run appDemoAsync.py when the container launches
 CMD ["python","-u", "src/server/main.py"]
-# (could a way to create unit config.yml CMD ["sh", "-c", "if [ \"$RUN_TESTS\" = \"true\" ]; then python -m unittest discover; else python main.py; fi"]
+# (could a way to create unit config.yml CMD ["sh", "-c", "if [ \"$RUN_TESTS\" = \"true\" ]; then python -m unittest discover; else python appDemoAsync.py; fi"]
