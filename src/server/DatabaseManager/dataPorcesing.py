@@ -71,7 +71,9 @@ class DataProcessor:
                 if line.strip():  # This checks if the line is not empty
                     file.write(line)
 
-    def plot_data(self):
+
+
+    def plot_data(self, data, period='all'):
         if self.all_data:
             # Convert all timestamps to timezone-naive
             for i in range(len(self.all_data)):

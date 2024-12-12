@@ -17,7 +17,7 @@ class DataFetcher:
         yfinance_format = timestamp.strftime('%Y-%m-%d %H:%M:%S')
         return yfinance_format
 
-    def fetch_active_period(self,start_date=0):
+    def fetch_active_period(self):
         # Fetch the historical data
         data = yf.Ticker(self.ticker).history(period='max')
         # Calculate the number of days the stock has been listed
@@ -70,15 +70,4 @@ class DataFetcher:
             return data
         except Exception as e:
             logger.error(f"Error fetching data: {e}")
-            return None
-
-    def fetch_data_less_precise(self, start_date, end_date, interval):
-        try:
-            data = yf.download(self.ticker, start=start_date, end=end_date, interval=interval)
-            if data.empty:
-                raise ValueError(f"No data found for {self.ticker} from {start_date} to {end_date}")
-            data.reset_index(inplace=True)  # Add the date index as a column
-            return data
-        except Exception as e:
-            logger.error(f"Error fetching less precise data: {e}")
             return None

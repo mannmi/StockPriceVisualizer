@@ -4,6 +4,7 @@ import requests
 import pandas as pd
 import plotly.express as px
 import mysql.connector
+from sqlalchemy import create_engine
 import yaml
 
 # Add the /app directory to sys.path
@@ -11,6 +12,8 @@ import yaml
 from src.config_loader.configLoader import Yml_Loader
 from src.logging.logging_config import logger
 from src.os_calls.basic_os_calls import is_running_in_docker
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
 
 
 # Database Manager Class
@@ -46,6 +49,7 @@ class DatabaseManager:
         self.conn = None
         self.cursor = None
         self.setup_database()
+        self.engine = engine = create_engine("mysql+pymysql://{user}:{pw}@{host}/{db}".format(host=self.host, db=self.database, user= self.user, pw=self.password))
         self.ticker_list_Storage = pd.DataFrame()
 
     def connect(self):
@@ -60,6 +64,7 @@ class DatabaseManager:
             self.cursor = self.conn.cursor()
 
     def fetch_data_from_db(self, symbol_id):
+        logger.info("Fetching data from database {symbol_id}".format(symbol_id=symbol_id))
         self.connect()
         query = """
         SELECT timestamp, open, high, low, close, volume
@@ -240,6 +245,7 @@ class DatabaseManager:
                     symbol_data['symbol']  # The symbol to identify the record to update
                 ))
                 self.conn.commit()
+
             else:
                 self.cursor.execute('''
                     INSERT INTO symbols (symbol, name, exchange, assetType, ipoDate, delistingDate, status, watching)
@@ -255,10 +261,12 @@ class DatabaseManager:
                     False  # Default value for 'watching'
                 ))
                 self.conn.commit()
+                result = self.cursor.fetchone()[0]
+
         finally:
             self.close()
 
-        # return symbol_id
+        return result
 
     def store_symbol(self, symbol):
         symbol_data = self.validate_symbol_data(symbol)

@@ -106,9 +106,18 @@ class LoadData(APIView):
 class PlotGraph(APIView):
     def post(self, request):
         all_data = request.data.get('all_data')
-        chunk_size = request.data.get('chunk_size', 1000)
-        fig, config = runner.plotGraph(pd.DataFrame(all_data), chunk_size)
-        return Response({'fig': fig, 'config': config})
+        chunk_size = request.data.get('chunk_size', 10)
+
+        all_data = runner.load_data(request)
+        fig_html = runner.plotGraph(all_data, chunk_size=10)
+
+        if fig_html is None:
+            logger.info("No data to plot.")
+            logger.debug(fig_html)
+            return
+
+        html = runner.plotGraph(pd.DataFrame(all_data), chunk_size)
+        return Response({'fig': html})
 
 
 class GetTickersFromVariable(APIView):

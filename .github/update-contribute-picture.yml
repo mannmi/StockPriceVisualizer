@@ -18,14 +18,14 @@ jobs:
       - name: Fetch user profile picture
         id: fetch_picture
         run: |
-          USERNAME="username"
+          USERNAME="your-username"
           PROFILE_PICTURE_URL="https://github.com/$USERNAME.png"
           echo "::set-output name=profile_picture_url::$PROFILE_PICTURE_URL"
 
       - name: Update README.md
         run: |
           PROFILE_PICTURE_URL=${{ steps.fetch_picture.outputs.profile_picture_url }}
-          sed -i "s|!\Profile Icon\|!Profile Icon|" README.md
+          sed -i "s|PROFILE_PICTURE_URL|$PROFILE_PICTURE_URL|" README.md
 
       - name: Commit changes
         run: |

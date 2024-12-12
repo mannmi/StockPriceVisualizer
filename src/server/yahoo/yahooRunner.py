@@ -71,8 +71,7 @@ class yahooRunner(Runner):
         return all_data
 
     def plotGraph(self,all_data,chunk_size):
-        self.dataProcessor.all_data = all_data
-        return self.dataProcessor.plot_data(chunk_size)
+        return self.dataProcessor.plot_data(all_data)
 
     def get_tickers_from_variable(self):
         self.ticker_list = self.db_manager.ticker_list_Storage
