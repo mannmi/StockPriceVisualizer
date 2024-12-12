@@ -3,11 +3,11 @@ import sys
 
 import matplotlib.pyplot as plt
 from datetime import timedelta
-
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
 import pandas as pd
 from matplotlib.figure import Figure
 from matplotlib.widgets import RectangleSelector  # Import RectangleSelector
-
 from src.logging.logging_config import logger
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '/app/')))
@@ -23,20 +23,12 @@ class DataProcessorYahoo(DataProcessor):
         self.tickerList = self.read_all_tickers_from_file()
         self.all_data = []
 
-    def process_data(self, start_date=0):
-        #todo when it gose life only fetch historical data when the markets are "down"
+    def process_data(self):
         market_checker = marketTimeChecker()
         fetcher = DataFetcher(self.ticker)
-        logger.info(self.ticker)
+        print(self.ticker)
 
-
-        days_to_go_back, ticker_first_updated, ticker_last_updated = fetcher.fetch_active_period(start_date)
-        #logger.info("output=> ",start_date, days_to_go_back, ticker_first_updated, ticker_last_updated )
-        if days_to_go_back == None and ticker_first_updated == None and ticker_last_updated == None:
-            return None
-        if days_to_go_back <= 0:
-            logger.info("no changes detected")
-            return
+        days_to_go_back, ticker_first_updated, ticker_last_updated = fetcher.fetch_active_period()
         days_to_go_back_total = days_to_go_back
         days_to_go_back = days_to_go_back_total
 
@@ -44,6 +36,7 @@ class DataProcessorYahoo(DataProcessor):
         end_date = market_checker.convert_to_market_time(local_time)
 
         days_passed = 0
+
         while days_to_go_back > 0:
             if days_passed >= 60:
                 interval = '1d'
@@ -101,105 +94,46 @@ class DataProcessorYahoo(DataProcessor):
         ax.set_ylim(eclick.ydata, erelease.ydata)
         plt.draw()
 
-    def plot_data(self, chunk_size=1000):
-        if self.all_data.empty:
-            logger.error("It's empty")
-            return None, None
+    # Example usage
+    # data = pd.read_csv('your_data.csv')
+    # fig_html = plot_data(data, period='1Y')  # Plot data for the last 1 year
+    # fig_html = plot_data(data, period='2Y')  # Plot data for the last 2 years
+    # fig_html = plot_data(data, period='all')  # Plot all available data
 
-        logger.info(self.all_data)
+    def plot_data(self, data, period='all'):
+        if data.empty:
+            print("It's empty")
+            return None
+
+        print(data)
 
         # Convert all timestamps to timezone-naive
-        self.all_data['timestamp'] = pd.to_datetime(self.all_data['timestamp'])
-        self.all_data.set_index('timestamp', inplace=True)
-        self.all_data.index = self.all_data.index.tz_localize(None)
+        data['timestamp'] = pd.to_datetime(data['timestamp'])
+        data.set_index('timestamp', inplace=True)
+        data.index = data.index.tz_localize(None)
 
-        # Initialize the plot
-        fig = Figure()
-        ax = fig.add_subplot(111)
+        # Filter data based on the specified period
+        if period and period != 'all':
+            data = data.last(period)
 
-        # Plot the entire dataset with a single label for each data type
-        ax.plot(self.all_data.index, self.all_data['close'], label='Close')
-        ax.plot(self.all_data.index, self.all_data['volume'], label='Volume')
-        ax.plot(self.all_data.index, self.all_data['low'], label='Low')
-        ax.plot(self.all_data.index, self.all_data['high'], label='High')
-        ax.plot(self.all_data.index, self.all_data['open'], label='Open')
+        # Create subplots
+        fig = make_subplots(rows=2, cols=1, shared_xaxes=True,
+                            vertical_spacing=0.1, subplot_titles=('Price', 'Volume'))
+
+        # Add traces for price data
+        fig.add_trace(go.Scatter(x=data.index, y=data['close'], mode='lines', name='Close'), row=1, col=1)
+        fig.add_trace(go.Scatter(x=data.index, y=data['low'], mode='lines', name='Low'), row=1, col=1)
+        fig.add_trace(go.Scatter(x=data.index, y=data['high'], mode='lines', name='High'), row=1, col=1)
+        fig.add_trace(go.Scatter(x=data.index, y=data['open'], mode='lines', name='Open'), row=1, col=1)
+
+        # Add trace for volume data
+        fig.add_trace(go.Bar(x=data.index, y=data['volume'], name='Volume'), row=2, col=1)
 
         # Update layout to enable zoom and pan
-        ax.set_title('Closing Price')
-        ax.set_xlabel('Time')
-        ax.set_ylabel('Price (USD)')
-        ax.legend()
+        fig.update_layout(title='Stock Data', xaxis_title='Time', yaxis_title='Price (USD)',
+                          xaxis2_title='Time', yaxis2_title='Volume', showlegend=True)
 
-        # Enable interactive features
-        fig.tight_layout()
-        fig.canvas.mpl_connect('scroll_event', self.zoom)
+        fig_html = fig.to_html()
+        # Write the HTML to a file for debugging
 
-        # Add rectangle selector
-        self.rs = RectangleSelector(ax, self.onselect, useblit=True,
-                                    button=[1],  # Left mouse button
-                                    minspanx=5, minspany=5,
-                                    spancoords='pixels',
-                                    interactive=True)
-
-        return fig, None
-    # def plot_data(self, chunk_size=1000):
-    #     if self.all_data.empty:
-    #         print("It's empty")
-    #         return None, None
-    #
-    #     print(self.all_data)
-    #
-    #     # Convert all timestamps to timezone-naive
-    #     self.all_data['timestamp'] = pd.to_datetime(self.all_data['timestamp'])
-    #     self.all_data.set_index('timestamp', inplace=True)
-    #     self.all_data.index = self.all_data.index.tz_localize(None)
-    #
-    #     # Initialize the plot
-    #     fig = go.Figure()
-    #     num_chunks = len(self.all_data) // chunk_size + 1
-    #     for i in range(num_chunks):
-    #         chunk = self.all_data.iloc[i * chunk_size:(i + 1) * chunk_size]
-    #         if chunk.empty:
-    #             continue
-    #
-    #         # Add the chunk to the plot
-    #         fig.add_trace(go.Scatter(x=chunk.index, y=chunk['close'], mode='lines', name=f'Chunk {i + 1}'))
-    #
-    #     # Update layout to enable zoom and pan
-    #     fig.update_layout(
-    #         title='Closing Price',
-    #         xaxis_title='Time',
-    #         yaxis_title='Price (USD)',
-    #         legend_title='Legend',
-    #         hovermode='x unified',
-    #         dragmode='zoom',  # Set the drag mode to 'zoom'
-    #         modebar_add=['zoom', 'pan', 'resetScale2d']  # Add zoom and pan buttons to the mode bar
-    #     )
-    #
-    #     # Configuration to enable scroll zoom
-    #     config = {'scrollZoom': True}
-    #
-    #     return fig, config
-
-    # def plot_data(self, chunk_size=1000):
-    #     if self.all_data.empty:
-    #         print("It's empty")
-    #         return None
-    #
-    #     print(self.all_data)
-    #
-    #     # Convert all timestamps to timezone-naive
-    #     self.all_data['timestamp'] = pd.to_datetime(self.all_data['timestamp'])
-    #     self.all_data.set_index('timestamp', inplace=True)
-    #     self.all_data.index = self.all_data.index.tz_localize(None)
-    #
-    #     # Prepare data chunks
-    #     data_chunks = []
-    #     num_chunks = len(self.all_data) // chunk_size + 1
-    #     for i in range(num_chunks):
-    #         chunk = self.all_data.iloc[i * chunk_size:(i + 1) * chunk_size]
-    #         if chunk.empty:
-    #             continue
-    #         data_chunks.append({'x': chunk.index, 'y': chunk['close']})
-    #
-    #     return data_chunks
+        return fig_html

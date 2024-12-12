@@ -4,7 +4,7 @@ import requests
 import pandas as pd
 from PyQt6.QtWidgets import (
     QApplication, QWidget, QVBoxLayout, QTextEdit, QTableWidget, QTableWidgetItem,
-    QComboBox, QPushButton, QHBoxLayout, QLineEdit, QMenuBar, QMenu, QProgressBar
+    QComboBox, QPushButton, QHBoxLayout, QLineEdit, QMenuBar, QMenu, QProgressBar, QDialog
 )
 from PyQt6.QtCore import Qt, QThread, pyqtSignal
 from qasync import QEventLoop, asyncSlot
@@ -70,7 +70,7 @@ class ProgressDialog(QDialog):
 class AppDemo(QWidget):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle('Yahoo Runner')
+        self.setWindowTitle('Yahoo Async Runner')
         self.setGeometry(100, 100, 600, 400)
         self.plot_windows = []  # Keep track of plot windows
 
@@ -341,20 +341,32 @@ class AppDemo(QWidget):
                                    {'tickers': "A"})
         self.output.append("Ticker list stored.")
 
+    def debug_html(self, fig_html):
+        # Write the HTML to a file for debugging
+        try:
+            with open("fig_debug.html", "w", encoding="utf-8") as file:
+                file.write(fig_html)
+        except Exception as e:
+            print(f"Error writing to file: {e}")
+
     def visualize_row(self, row):
-        logger.info("visulaisation Started")
+        logger.info("Visualization Started")
         all_data = self.runner.load_data(row)
-        fig, config = self.runner.plotGraph(all_data, chunk_size=1000)
-        if fig is None:
+        fig_html = self.runner.plotGraph(all_data, chunk_size=10)
+
+
+        if fig_html is None:
             logger.info("No data to plot.")
-            logger.debug(fig, config)
+            logger.debug(fig_html)
             return
+
+        self.debug_html(fig_html)
 
         app = QApplication.instance()
         if not app:
             app = QApplication(sys.argv)
 
-        plot_window = PlotWindow(fig, config)
+        plot_window = PlotWindow(fig_html)
         plot_window.show()
         self.plot_windows.append(plot_window)  # Keep a reference
 
