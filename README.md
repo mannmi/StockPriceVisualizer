@@ -46,8 +46,8 @@ Contributions are welcome! Please see the CONTRIBUTING.md, COMMIT_MESSAGE.md,COD
 
 ## License
 
-This project is licensed under the LGPL-2.1 License. See the LICENSE file for details.
-* License => https://github.com/mannmi/StockPriceVisualizer?tab=LGPL-2.1-1-ov-file
+This project is licensed under the AGPL3 License. See the LICENSE file for details.
+* License => [https://github.com/mannmi/StockPriceVisualizer?tab=LGPL-2.1-1-ov-file](https://github.com/mannmi/StockPriceVisualizer/blob/main/LICENSE)
 
 
 Contributor List:
