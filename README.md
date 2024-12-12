@@ -5,7 +5,7 @@
 
 <p align="center">
   <!-- PSE Acceleration Program logo -->
-  <img width=40% src="docs/Logo.webp">
+  <img width=40% src="docs/screenImage.png">
 </p>
 
 <p align="center">
