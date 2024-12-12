@@ -1,5 +1,11 @@
+
 <p align="center">
   <a href="https://github.com/mannmi/StockPriceVisualizer/issues?q=is%3Aopen+is%3Aissue+-label%3A%22Application+Proposal%22+-label%3A%22WIP%22+">🚀 Apply for Open Task</a> | <a href="https://github.com/mannmi/StockPriceVisualizer/issues">✍️ Submit Your Idea</a> | <a href="https://github.com/mannmi/StockPriceVisualizer/issues/new?assignees=&labels=&projects=&template=bug_report.md&title="> 🐛 Submit Bug Report</a>
+</p>
+
+<p align="center">
+  <!-- PSE Acceleration Program logo -->
+  <img width=40% src="docs/Logo.webp">
 </p>
 
 <p align="center">
