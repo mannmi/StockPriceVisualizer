@@ -62,7 +62,7 @@ Open your web browser and go to http://127.0.0.1:8000/ to see your Django projec
 # Start up ui 
 Run the ui application with 
 ```bash
-python django_project/myapp/appDemoAsync.py
+python ui/appDemoAsync.py
 ```
 
 # Notes
