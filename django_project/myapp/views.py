@@ -1,31 +1,37 @@
 import os
 import sys
-
+from time import sleep
 import pandas as pd
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 
 from src.logging.logging_config import logger
+import src.os_calls.basic_os_calls as os_calls
 from src.server.yahoo.yahooRunner import yahooRunner
-#from django_project.myapp.serializers import TickerSerializer
-from src.server.DatabaseManager.runner import Runner
-from src.server.yahoo.dataProcesingYahoo import DataProcessorYahoo
-from src.server.yahoo.yahoo_db import Yahoo
-
-sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..'))
-import src.server.yahoo.yahooRunner
-
-api_key_Load = "Test key to load"
-docker_config = r"C:\Users\mannnmi\CryptoPrediction\docker-compose.yml"
-config_path = r"C:\Users\mannnmi\CryptoPrediction\config_loader\config.yml"
-tickerFilePath = r"C:\Users\mannnmi\CryptoPrediction\src\server\listing_status.csv"
-runner = yahooRunner(api_key_Load, docker_config, config_path, tickerFilePath)
-
 # views.py
 import logging
 from django.http import HttpResponse
 from django.shortcuts import render
+
+
+
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..'))
+import src.server.yahoo.yahooRunner
+
+
+if os_calls.is_running_in_docker():
+    cpathRoot = os.path.abspath("../")
+
+else:
+    cpathRoot = os.path.abspath("")
+
+api_key_Load = "Test key to load"
+docker_config = cpathRoot + "/docker-compose.yml"
+config_path = cpathRoot + "/config_loader/config.yml"
+tickerFilePath = cpathRoot + "/src/server/listing_status.csv"
+runner = yahooRunner(api_key_Load, docker_config, config_path, tickerFilePath)
+
 
 
 

@@ -1,3 +1,4 @@
+import os
 import sys
 import asyncio
 import requests
@@ -10,6 +11,7 @@ from PyQt6.QtCore import Qt, QThread, pyqtSignal
 from qasync import QEventLoop, asyncSlot
 
 from src.logging.logging_config import logger
+import src.os_calls.basic_os_calls as os_calls
 from src.server.yahoo.yahooRunner import yahooRunner
 from ui.PlotWindow import PlotWindow
 
@@ -74,10 +76,11 @@ class AppDemo(QWidget):
         self.setGeometry(100, 100, 600, 400)
         self.plot_windows = []  # Keep track of plot windows
 
+        cpathRoot = os_calls.get_root_path()
         api_key_Load = "Test key to load"
-        docker_config = r"C:\Users\mannnmi\CryptoPrediction\docker-compose.yml"
-        config_path = r"C:\Users\mannnmi\CryptoPrediction\config_loader\config.yml"
-        tickerFilePath = r"C:\Users\mannnmi\CryptoPrediction\src\server\listing_status.csv"
+        docker_config = cpathRoot + "/docker-compose.yml"
+        config_path = cpathRoot + "/config_loader/config.yml"
+        tickerFilePath = cpathRoot + "/src/server/listing_status.csv"
         self.runner = yahooRunner(api_key_Load, docker_config, config_path, tickerFilePath)
 
         layout = QVBoxLayout()

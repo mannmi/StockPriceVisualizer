@@ -1,3 +1,4 @@
+import os
 import sys
 
 import subprocess
@@ -82,10 +83,11 @@ class AppDemo(QWidget):
         self.setGeometry(100, 100, 600, 400)
         self.plot_windows = []  # Keep track of plot windows
 
+        cpathRoot = os.path.abspath("../")
         api_key_Load = "Test key to load"
-        docker_config = r"C:\Users\mannnmi\CryptoPrediction\docker-compose.yml"
-        config_path = r"C:\Users\mannnmi\CryptoPrediction\config_loader\config.yml"
-        tickerFilePath = r"C:\Users\mannnmi\CryptoPrediction\src\server\listing_status.csv"
+        docker_config = cpathRoot + "/docker-compose.yml"
+        config_path = cpathRoot + "/config_loader/config.yml"
+        tickerFilePath = cpathRoot + "/src/server/listing_status.csv"
         self.runner = yahooRunner(api_key_Load, docker_config, config_path, tickerFilePath)
 
         layout = QVBoxLayout()

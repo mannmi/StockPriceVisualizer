@@ -138,32 +138,48 @@ class Yahoo(DatabaseManager):
 
 # Example usage
 if __name__ == "__main__":
+
+    parser = argparse.ArgumentParser(description="Database Setup Script.")
+
+    # Define the --updatelist flag
+    parser.add_argument('--updatelist', action='store_true', help="Update the list")
+    # Define other flags
+    parser.add_argument('--verbose', action='store_true', help="Enable verbose output")
+    parser.add_argument('--config', type=str, help="Path to the configuration file")
+
+    args = parser.parse_args()
+
+    if args.updatelist:
+        logger.info("Updating the list...")
+    if args.verbose:
+        set_log_level(logging.INFO)
+    else:
+        set_log_level(logging.DEBUG)
+    if args.config:
+        logger.info(f"Using configuration file: {args.config}")
+
     logger.info("starting the run")
+
     api_key_Load = 'your_api_key_here'  # Replace with your actual API key
     docker_config = '/app/docker-compose.yml'
     config_path = "/app/config_loader/config.yml"
     tickerFilePath = "/app/server/listing_status.csv"
     config = Yml_Loader(docker_config)
 
+    print("get tickets")
     dataProcessor = DataProcessorYahoo("A", tickerFilePath)
-    dataProcessor.strip_empty_lines()
 
+    print("Read All tickers")
     tickers_list = dataProcessor.read_all_tickers_from_file()
 
-    # print(tickers_list)
-
-    # if tickers_list.empty:
-    #     print("The DataFrame is empty.")
-    #     exit()
-
-    # print(tickers_list)
+    print("Seting up db_manager")
     db_manager = (Yahoo(docker_config, config, tickerFilePath))
-    # #db_manager.fetch_and_store_symbol(tickers_list, api_key_Load)
-    # db_manager.add_to_watcher_list("AMD")
-    # db_manager.add_to_watcher_list("A")
+    db_manager.fetch_and_store_symbol(tickers_list, api_key_Load)
 
+    print("Storing Data in Database")
     # tickers_list = db_manager.get_ticker_list()
     # db_manager.fetch_and_store_symbol(tickers_list, 0)
     ticker_list = db_manager.get_ticker_list()
+    # print(ticker_list)
+    # db_manager.fetch_and_store_data(tickers_list, api_key_Load)
 
-    db_manager.fetch_and_store_data(tickers_list, api_key_Load)

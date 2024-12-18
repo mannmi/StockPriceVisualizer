@@ -41,7 +41,6 @@ class DatabaseManager:
         if is_running_in_docker():
             self.host = "db"
         else:
-            logger.info("Not running inside a Docker container")
             self.host = "127.0.0.1"
 
         hostPort, containerPort = self.docker_config.data['services']['db']['ports'][0].split(':')

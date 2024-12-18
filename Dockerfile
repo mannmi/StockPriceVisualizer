@@ -23,13 +23,6 @@ RUN pip install --upgrade pip
 RUN pip install --trusted-host pypi.python.org -r requirements.txt
 
 # Install dependencies
-RUN apt-get update && apt-get install -y \
-    qt5-default \
-    qtcreator \
-    build-essential \
-    libgl1-mesa-glx \
-    libx11-dev \
-    x11-apps \
 
 # Set environment variables for Qt
 ENV QT_X11_NO_MITSHM=1

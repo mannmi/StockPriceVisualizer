@@ -27,6 +27,8 @@ pandas
 PyQt6
 qasync
 PyQt6-WebEngine
+markdown
+django
 
 
 
