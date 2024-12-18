@@ -23,29 +23,19 @@ StockPriceVisualizer: 📈 Dive into the world of stock prices with real-time vi
 - Server (API) for fetching data and updating said data
 - UI/API usage
 
-## TODO List
-
-- [ ] Fix database scraper (there still seems to be an issue with the function `fetch_active_period`). For now, it is commented out, but fixing it would improve performance when updating the database.
-- [ ] Switch the graph rendering for the table; it's kind of bad. (Qt web seems to be broken on my system, so I can't test it. It now opens a browser tab instead.)
-- [ ] Fix filter rules
-- [ ] There is currently no protection against race conditions (The watch list load has to be manually triggered).
-
 ---
 
 ## Installation
 
-For a guide on how to install the application, refer to INSTALL.md.  
-=> [docs/INSTAL.md](docs/INSTAL.md)
+For a guide on how to install the application, refer to [docs/INSTAL.md](docs/INSTAL.md)
 
 ## Starting Server (API)/DB/UI
 
-For a guide on how to run the application, refer to RUN.md.  
-=> [docs/RUN.md](docs/RUN.md)
+For a guide on how to run the application, refer to [docs/RUN.md](docs/RUN.md)
 
-## Usage
+## User Guide
 
-For a guide on the button functionality, please read the User Guide.  
-=> [Userguide](docs/USING_APP.md)  
+For a guide on the button functionality, please read the [User Guide](docs/USING_APP.md)  
 
 ---
 
@@ -53,19 +43,31 @@ For a guide on the button functionality, please read the User Guide.
 
 For a short explanation of the Django API created, refer to API Documentation.  
 
-API Documentation => [API Documentation LINK](../../StockPriceVisualizer/docs/api_documentation.md)
+API Documentation => [API Documentation LINK](docs/API_DOCUMENTATION.md)
 
 Or run the web server (use the IP of the server):
 - http://127.0.0.1:8000/api/rawDocumentation/
 - http://127.0.0.1:8000/documentation/
 
+---
+
 ## Contributing
 
 Contributions are welcome! Please see the CONTRIBUTING.md, COMMIT_MESSAGE.md, and CODE_OF_CONDUCT.md for guidelines.  
 
-* CONTRIBUTING.md => [CONTRIBUTING.md](docs/CONTRIBUTING.md)
-* COMMIT_MESSAGE.md => [COMMIT_MESSAGE.md](docs/COMMIT_MESSAGE.md)
-* CODE_OF_CONDUCT.md => [CODE_OF_CONDUCT.md](docs/CODE_OF_CONDUCT.md)
+* [CONTRIBUTING.md](docs/CONTRIBUTING.md)
+* [COMMIT_MESSAGE.md](docs/COMMIT_MESSAGE.md)
+* [CODE_OF_CONDUCT.md](docs/CODE_OF_CONDUCT.md)
+
+## TODO List
+
+- [ ] Fix database scraper (there still seems to be an issue with the function `fetch_active_period`). For now, it is commented out, but fixing it would improve performance when updating the database.
+- [ ] Switch the graph rendering for the table; it's kind of bad. (Qt web seems to be broken on my system, so I can't test it. It now opens a browser tab instead.)
+- [ ] Fix filter rules
+- [ ] There is currently no protection against race conditions (The watch list load has to be manually triggered).
+
+
+--- 
 
 ## License
 
@@ -73,6 +75,7 @@ This project is licensed under the AGPL3 License. See the LICENSE file for detai
 
 License => [https://github.com/mannmi/StockPriceVisualizer?tab=LGPL-2.1-1-ov-file](https://github.com/mannmi/StockPriceVisualizer/blob/main/LICENSE)
 
+---
 
 ## Contributor List
 
