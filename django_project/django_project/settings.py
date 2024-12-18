@@ -12,14 +12,14 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 import os
 import sys
-
-import logging.config
-
+from time import sleep
 # Add the src directory to the Python path
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..'))
-
+from src.logging.logging_config import logger
+import logging.config
 from pathlib import Path
 from src.config_loader.configLoader import Yml_Loader
+from src.os_calls.basic_os_calls import is_running_in_docker
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -29,23 +29,32 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-y8mj^eqhbs=1yeiz!*mwela@k5gui(0vcyon7jkm+ca341)zdv'
-
 # load Data
-cpath = r"C:\Users\mannnmi\CryptoPrediction\docker-compose.yml"
-docker_config = Yml_Loader(cpath)
-dbConf = docker_config.data['services']['db']['environment']
+
+if is_running_in_docker():
+    cpath = os.path.abspath("../docker-compose.yml")
+    docker_config = Yml_Loader(cpath)
+    dbConfFull = docker_config.data['services']['db']
+    host = dbConfFull["networks"]["custom_network"]["ipv4_address"]
+else:
+    cpath = os.path.abspath("../docker-compose.yml")
+    docker_config = Yml_Loader(cpath)
+    dbConfFull = docker_config.data['services']['db']
+    host = "127.0.0.1"
+
+dbConf = dbConfFull['environment']
 user = dbConf['MYSQL_USER']
 password = dbConf['MYSQL_PASSWORD']
 database = dbConf['MYSQL_DATABASE']
 # todo change to ip where the server is setup :) may have to move this to a config at somme stage (this is a dirty implementation)
-host = "127.0.0.1"
+
 
 hostPort, containerPort = docker_config.data['services']['db']['ports'][0].split(':')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
 # Application definition
 

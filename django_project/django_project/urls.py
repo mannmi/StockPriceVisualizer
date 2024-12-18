@@ -17,9 +17,12 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
+from documentation.views import api_documentation_view, raw_markdown_view
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('myapp.urls')),
-
+    path('documentation/', api_documentation_view, name='api_documentation'),
+    path('api/rawDocumentation/', raw_markdown_view, name='raw_documentation'),
 
 ]

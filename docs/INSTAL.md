@@ -1,17 +1,35 @@
-# Doker Installation Guide
-install docker modifie the docker-compose.yml to suite your use :)
+# Needed Setup Steps
 
-```bash
-docker-compose up --build
-```
+## Preparation:
 
+- Setting up Docker Containers
+- Setting up Django Server (deprecated)
 
-# Django Project Installation Guide
+## Run:
+
+- Start Docker Containers
+- Start Django Server (deprecated)
+- Start UI
+
+---
+
+# Install Docker
+
+Install docker = https://docs.docker.com/engine/install/
+
+---
+
+# Install Django Project (deprecated)
+
+<Details>
+There is a docker container you can use (django_app)
 
 ## 1. Install Python and Pip
+
 Make sure you have Python and Pip installed on your system. You can download Python from python.org.
 
 ## 2. Set Up a Virtual Environment
+
 It's a good practice to use a virtual environment to manage dependencies.
 
 ```bash
@@ -20,50 +38,97 @@ pip install virtualenv
 
 # Create a virtual environment
 python -m venv venv
-
 ```
 
-# Activate the virtual environment
-## On Windows
+### Activate the Virtual Environment
+
+#### On Windows
+
 ```cmd
 venv\Scripts\activate
 ```
-## On macOS/Linux
+
+#### On macOS/Linux
 
 ```bash
 source venv/bin/activate
 ```
 
+## 3. Install Dependencies
 
-## 3. Install Django
-Install Django using pip.
+```bash
+pip install -r requirements.txt
 ```
+
+## 4. Install Django
+
+Install Django using pip.
+
+```bash
 pip install django
 ```
 
-## 4. Run Django Server
-Modifie The Database Information in docker-compose.yml
+## 5. Run Django Server
 
-7. Apply Migrations
+Modify the database information in \`docker-compose.yml\`.
+
+Change into the project directory:
+
+```bash
+cd django_project
+```
+
+### Apply Migrations
+
 Apply initial migrations to set up the database.
+
 ```bash
 python manage.py migrate
 ```
 
-8. Run the Development Server
+</Details>
 
-Start the Django development server.
-```bash
-python manage.py runserver
-```
-9. Access the Project
-Open your web browser and go to http://127.0.0.1:8000/ to see your Django project running.
+# Installing Ui enviroment
 
-# Start up ui 
-Run the ui application with 
+## 1. Install Python and Pip
+
+Make sure you have Python and Pip installed on your system. You can download Python from python.org.
+
+## 2. Set Up a Virtual Environment
+
+It's a good practice to use a virtual environment to manage dependencies.
+
 ```bash
-python ui/appDemoAsync.py
+# Install virtualenv if you don't have it
+pip install virtualenv
+
+# Create a virtual environment
+python -m venv venv
 ```
+
+### Activate the Virtual Environment
+
+#### On Windows
+
+```cmd
+venv\Scripts\activate
+```
+
+#### On macOS/Linux
+
+```bash
+source venv/bin/activate
+```
+
+## 3. Install Dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+---
 
 # Notes
-Please dont mind asking question in the :) discussion tab
+
+Please don't hesitate to ask questions in the discussion tab :)
+On how to run the Applications See [run.md](./RUN.md)

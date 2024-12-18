@@ -1,15 +1,14 @@
 services:
   python_app:
     build: .
-    command: /bin/sh -c "python appDemoAsync.py && sleep infinity || sleep infinity"
+    command: /bin/sh -c "python server/yahoo/yahoo_db.py && sleep infinity || sleep infinity"
     volumes:
       - ./src/server:/app/server
-      - ./src/config_loader:/app/config_loader
-      - ./requirements.txt:/app/requirements.txt
       - ./src/os_calls:/app/os_calls
+      - ./src/config_loader:/app/config_loader
       - ./src/marketCheck:/app/marketCheck
-      - ./src:/app/src
-      - ./ui/:/app/ui/
+      - ./requirements.txt:/app/requirements.txt
+      #- ./ui/:/app/ui/
     ports:
       - "5000:5000"
     depends_on:
@@ -19,6 +18,24 @@ services:
     networks:
       custom_network:
         ipv4_address: 172.20.0.2
+  django_app:
+    build: .
+    command: /bin/sh -c "sleep 5 && django_project/run.sh"
+    volumes:
+      - ./requirements.txt:/app/requirements.txt
+      - ./django_project:/app/django_project
+      - ./ui/:/app/ui/
+      - ./src:/app/src/
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    environment:
+      - FLASK_RUN_HOST=0.0.0.0
+    networks:
+      custom_network:
+        ipv4_address: 172.20.0.4
+
   #db dose not have to be started see condtional code #todo latter add a try catch. mongo is atm mandetory :)
   db:
     image: mysql:latest
@@ -63,19 +80,21 @@ services:
     privileged: true
 
   test:
-      build: .
-      #command: python -m unittest tests
-      #todo this line was added to debug the docker contianer remove when i deployment :)
-      command: bash -c "python -m unittest discover -s tests"
-      volumes:
-        - .:/app
-        - ./requirements.txt:/app/requirements.txt
-      depends_on:
-        - db
+    build: .
+    #command: python -m unittest tests
+    command: bash -c "python -m unittest discover -s tests"
+    volumes:
+      - .:/app
+      - ./requirements.txt:/app/requirements.txt
+    depends_on:
+      - db
 
 networks:
   custom_network:
     driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
 
 
 volumes:

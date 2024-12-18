@@ -2,9 +2,6 @@
 import os
 from os import system, name
 
-# import sleep to show output for some time period
-from time import sleep
-
 
 def clear():
     """
@@ -17,6 +14,14 @@ def clear():
     # for mac and linux(here, os.name is 'posix')
     else:
         _ = system('clear')
+
+def get_root_path():
+    if is_running_in_docker():
+        cpathRoot = os.path.abspath("")
+    else:
+        cpathRoot = os.path.abspath("../")
+
+    return cpathRoot
 
 
 def is_running_in_docker():
@@ -37,6 +42,8 @@ def is_running_in_docker():
 
 #how to run it :)
 # if is_running_in_docker():
-#     print("Running inside a Docker container")
+#     logger.info("Running inside a Docker container")
 # else:
-#     print("Not running inside a Docker container")
+#     logger.info("Not running inside a Docker container")
+#
+
