@@ -1,51 +1,43 @@
 import os
-import sys
-
 import pandas as pd
 import matplotlib.pyplot as plt
-from datetime import timedelta
-
 import requests
-
 from src.logging.logging_config import logger
-#sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '/app/src/')))
-from src.marketCheck.marketCheck import marketTimeChecker
-from src.server.yahoo.fetchYahoo import DataFetcher
+
+
+def fetch_all_tickers(api_key):
+    url = 'https://www.alphavantage.co/query'
+    params = {
+        'function': 'LISTING_STATUS',
+        'apikey': api_key
+    }
+    response = requests.get(url, params=params)
+    data = response.text
+    # Load the CSV data into a DataFrame
+    # df = pd.read_csv('../listing_status.csv')
+    return data
 
 
 class DataProcessor:
-    def __init__(self, ticker):
+    def __init__(self, ticker,ticker_file_path):
         self.ticker = ticker
-        self.tickerFilePath = "/app/server/listing_status.csv"
+        self.ticker_file_path = ticker_file_path
         self.tickerList = self.read_all_tickers_from_file()
         self.all_data = []
 
 
-    # no api on yaho to do this :)
-    def fetch_all_tickers(self, api_key):
-        url = 'https://www.alphavantage.co/query'
-        params = {
-            'function': 'LISTING_STATUS',
-            'apikey': api_key
-        }
-        response = requests.get(url, params=params)
-        data = response.text
-        # Load the CSV data into a DataFrame
-        # df = pd.read_csv('../listing_status.csv')
-        return data
-
     def store_all_tickers_file(self, symbol):
         # Save the CSV data to a file
-        with open(self.tickerFilePath, 'w') as file:
+        with open(self.ticker_file_path, 'w') as file:
             file.write(symbol)
 
     def read_all_tickers_from_file(self):
-        file_path = self.tickerFilePath
+        file_path = self.ticker_file_path
         if os.path.getsize(file_path) == 0:
             logger.debug("The file is empty.")
             exit()
         else:
-            data = pd.read_csv(file_path)
+            #data = pd.read_csv(file_path)
             logger.info("Data read successfully.")
 
         # Save the CSV data to a file
@@ -56,11 +48,11 @@ class DataProcessor:
         return data
 
     def strip_empty_lines(self):
-        file_path = self.tickerFilePath
+        file_path = self.ticker_file_path
         if os.path.getsize(file_path) == 0:
             logger.debug("The file is empty.")
         else:
-            data = pd.read_csv(file_path)
+            #data = pd.read_csv(file_path)
             logger.info("Data read successfully.")
 
         with open(file_path, 'r') as file:

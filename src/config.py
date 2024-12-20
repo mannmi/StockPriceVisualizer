@@ -1,4 +1,3 @@
-import sys
 import os
 
 def setup_paths():

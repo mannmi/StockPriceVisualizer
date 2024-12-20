@@ -1,30 +1,45 @@
-import os
-import sys
-
 import matplotlib.pyplot as plt
 from datetime import timedelta
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import pandas as pd
-from matplotlib.figure import Figure
-from matplotlib.widgets import RectangleSelector  # Import RectangleSelector
-from src.logging.logging_config import logger
-
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '/app/')))
-from src.marketCheck.marketCheck import marketTimeChecker
+from src.marketCheck.marketCheck import Markettimechecker
 from src.server.yahoo.fetchYahoo import DataFetcher
 from src.server.DatabaseManager.dataPorcesing import DataProcessor
 
 
+def zoom(event):
+    ax = plt.gca()
+    xlim = ax.get_xlim()
+    ylim = ax.get_ylim()
+
+    zoom_factor = 1.2 if event.step > 0 else 1 / 1.2
+
+    new_xlim = [(x - (x - xlim[0]) * zoom_factor) for x in xlim]
+    new_ylim = [(y - (y - ylim[0]) * zoom_factor) for y in ylim]
+
+    ax.set_xlim(new_xlim)
+    ax.set_ylim(new_ylim)
+    plt.draw()
+
+
+def onselect(eclick, erelease):
+    ax = plt.gca()
+    ax.set_xlim(eclick.xdata, erelease.xdata)
+    ax.set_ylim(eclick.ydata, erelease.ydata)
+    plt.draw()
+
+
 class DataProcessorYahoo(DataProcessor):
-    def __init__(self, ticker, tickerFilePath):
+    def __init__(self, ticker, ticker_file_path):
+        super().__init__(ticker,ticker_file_path)
         self.ticker = ticker
-        self.tickerFilePath = tickerFilePath
+        self.tickerFilePath = ticker_file_path
         self.tickerList = self.read_all_tickers_from_file()
         self.all_data = []
 
     def process_data(self):
-        market_checker = marketTimeChecker()
+        market_checker = Markettimechecker()
         fetcher = DataFetcher(self.ticker)
         print(self.ticker)
 
@@ -51,13 +66,13 @@ class DataProcessorYahoo(DataProcessor):
                 fetch_days = 7
                 days_pass_range = 30
 
-            last_runer = False
+            #last_runer = False
             if days_pass_range != -1:
                 remaining_days = days_pass_range - days_passed
                 remain_day_test = remaining_days % fetch_days
 
                 if days_pass_range < (days_passed + fetch_days + remain_day_test):
-                    last_runer = True
+                    #last_runer = True
                     fetch_days = remain_day_test
 
             start_date = end_date - timedelta(days=min(fetch_days, days_to_go_back))
@@ -73,26 +88,6 @@ class DataProcessorYahoo(DataProcessor):
 
         combined_data = pd.concat(self.all_data, ignore_index=True)
         return combined_data
-
-    def zoom(self, event):
-        ax = plt.gca()
-        xlim = ax.get_xlim()
-        ylim = ax.get_ylim()
-
-        zoom_factor = 1.2 if event.step > 0 else 1 / 1.2
-
-        new_xlim = [(x - (x - xlim[0]) * zoom_factor) for x in xlim]
-        new_ylim = [(y - (y - ylim[0]) * zoom_factor) for y in ylim]
-
-        ax.set_xlim(new_xlim)
-        ax.set_ylim(new_ylim)
-        plt.draw()
-
-    def onselect(self, eclick, erelease):
-        ax = plt.gca()
-        ax.set_xlim(eclick.xdata, erelease.xdata)
-        ax.set_ylim(eclick.ydata, erelease.ydata)
-        plt.draw()
 
     # Example usage
     # data = pd.read_csv('your_data.csv')

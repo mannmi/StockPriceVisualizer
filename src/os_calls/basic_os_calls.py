@@ -17,11 +17,11 @@ def clear():
 
 def get_root_path():
     if is_running_in_docker():
-        cpathRoot = os.path.abspath("")
+        cpath_root = os.path.abspath("")
     else:
-        cpathRoot = os.path.abspath("../")
+        cpath_root = os.path.abspath("../")
 
-    return cpathRoot
+    return cpath_root
 
 
 def is_running_in_docker():

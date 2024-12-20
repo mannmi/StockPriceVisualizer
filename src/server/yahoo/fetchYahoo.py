@@ -1,21 +1,18 @@
-import pandas as pd
-import yfinance as yf
-
 from src.logging.logging_config import logger
 import yfinance as yf
-from datetime import datetime
+
+
+def convert_timestamp_to_yfinance_format(timestamp):
+    if timestamp == 0:
+        return None
+    # Convert to yfinance format (YYYY-MM-DD HH:MM:SS)
+    yfinance_format = timestamp.strftime('%Y-%m-%d %H:%M:%S')
+    return yfinance_format
 
 
 class DataFetcher:
     def __init__(self, ticker):
         self.ticker = ticker
-
-    def convert_timestamp_to_yfinance_format(self, timestamp):
-        if timestamp == 0:
-            return None
-        # Convert to yfinance format (YYYY-MM-DD HH:MM:SS)
-        yfinance_format = timestamp.strftime('%Y-%m-%d %H:%M:%S')
-        return yfinance_format
 
     def fetch_active_period(self):
         # Fetch the historical data
@@ -57,9 +54,6 @@ class DataFetcher:
     #     logger.info(f'{self.ticker} has been listed for {listing_minutes} minutes.')
     #     logger.info(f'{data.index} vs {start_date} time stamp.')
     #     return listing_minutes, ticker_first_updated, ticker_last_updated
-
-    import yfinance as yf
-    import pandas as pd
 
     def fetch_data(self, start_date, end_date, interval='1m'):
         try:

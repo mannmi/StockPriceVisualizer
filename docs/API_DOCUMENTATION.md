@@ -248,10 +248,10 @@ Response Example:
 [
   {
     
-  "ticker": "AAPL", "data": {...}},
+  "ticker": "AAPL", "data": {"...":"..."}},
   {
     
-  "ticker": "GOOGL", "data": {...}}
+  "ticker": "GOOGL", "data": {"...":"..."}}
 ]
 ```
 

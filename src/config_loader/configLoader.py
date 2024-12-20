@@ -39,12 +39,17 @@ import yaml
 #
 # @endcode
 
-class Yml_Loader:
+def detect_doblicates(tmpdata):
+    duplicates = [key for key, value in collections.Counter(tmpdata.values()).items() if value > 1]
+    print(duplicates)
+
+
+class YmlLoader:
     ## @brief The constructor for the Yml_Loader class.
     #  @param pathConfig The path to the configuration file.
-    def __init__(self, pathConfig):
+    def __init__(self, path_config):
         ## Path to the config that will be loaded
-        self.pathConfig = pathConfig
+        self.pathConfig = path_config
         ## Contains the loaded data of the Config
         self.data = self.load_config()
 
@@ -60,11 +65,6 @@ class Yml_Loader:
     def __setitem__(self, key, value):
         self.data[key] = value
         # self.save_config()
-
-    def detect_doblicates(self, tmpdata):
-        duplicates = [key for key, value in collections.Counter(tmpdata.values()).items() if value > 1]
-        print(duplicates)
-
 
     ## @brief Load the configuration data from the configuration file.
     #  @return The configuration data.

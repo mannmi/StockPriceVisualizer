@@ -1,30 +1,40 @@
-import os
-import sys
-
 import pandas as pd
 import requests
 
 from src.logging.logging_config import logger
-#sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
+# sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
 from src.server.DatabaseManager.DatabaseManager import DatabaseManager
 
 # Add the /app directory to sys.path
 
-
-from src.config_loader.configLoader import Yml_Loader
-
 logger.info("MySQL Connector is installed and working!")
+
+
+def fetch_all_tickers(api_key):
+    url = 'https://www.alphavantage.co/query'
+    params = {
+        'function': 'LISTING_STATUS',
+        'apikey': api_key
+    }
+    response = requests.get(url, params=params)
+    data = response.text
+
+    # Save the CSV data to a file
+    with open('../listing_status.csv', 'w') as file:
+        file.write(data)
+
+    # Load the CSV data into a DataFrame
+    # df = pd.read_csv('../listing_status.csv')
+    return data
 
 
 class AlphaEvent(DatabaseManager):
     def __init__(self, docker_config, api_key):
         super().__init__(docker_config, api_key)
 
-
-
     def store_data(self, symbol, df):
         symbol_id = self.update_symbol(symbol)
-        #store prices in database
+        # store prices in database
         for index, row in df.iterrows():
             self.cursor.execute('''
             SELECT COUNT(*) FROM prices WHERE symbol_id = %s AND timestamp = %s
@@ -34,33 +44,17 @@ class AlphaEvent(DatabaseManager):
                 self.cursor.execute('''
                 INSERT INTO prices (symbol_id, timestamp, open, high, low, close, volume)
                 VALUES (%s, %s, %s, %s, %s, %s, %s)
-                ''', (symbol_id, index, row['1. open'], row['2. high'], row['3. low'], row['4. close'], row['5. volume']))
+                ''', (
+                symbol_id, index, row['1. open'], row['2. high'], row['3. low'], row['4. close'], row['5. volume']))
         self.conn.commit()
         self.close()
         logger.info(f"Data for {symbol} has been stored in the database.")
 
-    #no api on yaho to do this :)
-    def fetch_all_tickers(api_key):
-        url = 'https://www.alphavantage.co/query'
-        params = {
-            'function': 'LISTING_STATUS',
-            'apikey': api_key
-        }
-        response = requests.get(url, params=params)
-        data = response.text
-
-        # Save the CSV data to a file
-        with open('../listing_status.csv', 'w') as file:
-            file.write(data)
-
-        # Load the CSV data into a DataFrame
-        #df = pd.read_csv('../listing_status.csv')
-        return data
 
     # Fetch and store data for multiple tickers
     def fetch_and_store_data(self, tickers, api_key):
         url = 'https://www.alphavantage.co/query'
-        configAuth = Yml_Loader('./config.yml')
+        # configAuth = Yml_Loader('./config.yml')
 
         if not tickers:
             raise ValueError("The list of tickers is empty. Please provide at least one ticker symbol.")
@@ -100,26 +94,27 @@ class AlphaEvent(DatabaseManager):
             except Exception as e:
                 print(f"An error occurred for {ticker}: {e}")
 
+
 # Example usage
-if __name__ == "__main__":
-    api_key = 'your_api_key_here'  # Replace with your actual API key
-    docker_config = '/app/docker-compose.yml'
-    config_path = "/app/config_loader/config.yml"
-    config = Yml_Loader(docker_config)
-
-    db_manager = AlphaEvent(docker_config,config)
-
-    tickers = db_manager.fetch_all_tickers()
-
-    db_manager.fetch_and_store_data(tickers, api_key)
-
-    # # Create an interactive plot with Plotly
-    # fig = px.line(df, x=df.index, y='4. close', title=f'{ticker} Intraday Stock Prices')
-    # fig.update_layout(
-    #     xaxis_title='Time',
-    #     yaxis_title='Price (USD)',
-    #     hovermode='x unified'
-    # )
-    #
-    # # Show the plot
-    # fig.show()
+# if __name__ == "__main__":
+#     api_key = 'your_api_key_here'  # Replace with your actual API key
+#     docker_config = '/app/docker-compose.yml'
+#     config_path = "/app/config_loader/config.yml"
+#     config = YmlLoader(docker_config)
+#
+#     db_manager = AlphaEvent(docker_config, config)
+#
+#     tickers = db_manager.fetch_all_tickers()
+#
+#     db_manager.fetch_and_store_data(tickers, api_key)
+#
+#     # # Create an interactive plot with Plotly
+#     # fig = px.line(df, x=df.index, y='4. close', title=f'{ticker} Intraday Stock Prices')
+#     # fig.update_layout(
+#     #     xaxis_title='Time',
+#     #     yaxis_title='Price (USD)',
+#     #     hovermode='x unified'
+#     # )
+#     #
+#     # # Show the plot
+#     # fig.show()

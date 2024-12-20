@@ -24,6 +24,10 @@ Open your web browser and go to http://127.0.0.1:8000/ to see your Django projec
 
 # Start Up UI
 
+## Start the enviroment
+set PYTHONPATH=%PYTHONPATH%;C:\path\to\your\venv
+
+
 Run the UI application with:
 
 ```bash

@@ -1,9 +1,5 @@
-# In /app/src/config_loader/__init__.py
-# This file can be empty but i chose to creat a file check :)
-
 import os
 import sys
-
 
 def check_file_exists(file_path):
     # Check if the file exists

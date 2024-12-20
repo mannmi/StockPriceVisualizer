@@ -1,4 +1,3 @@
-import os
 import sys
 import asyncio
 import requests
@@ -12,7 +11,7 @@ from qasync import QEventLoop, asyncSlot
 
 from src.logging.logging_config import logger
 import src.os_calls.basic_os_calls as os_calls
-from src.server.yahoo.yahooRunner import yahooRunner
+from src.server.yahoo.Yahoorunner import Yahoorunner
 from ui.PlotWindow import PlotWindow
 
 
@@ -69,6 +68,21 @@ class ProgressDialog(QDialog):
         self.progress_bar.setValue(value)
 
 
+def create_read_only_item(text):
+    item = QTableWidgetItem(text)
+    item.setFlags(Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsEnabled)
+    return item
+
+
+def debug_html(fig_html):
+    # Write the HTML to a file for debugging
+    try:
+        with open("fig_debug.html", "w", encoding="utf-8") as file:
+            file.write(fig_html)
+    except Exception as e:
+        print(f"Error writing to file: {e}")
+
+
 class AppDemo(QWidget):
     def __init__(self):
         super().__init__()
@@ -76,12 +90,12 @@ class AppDemo(QWidget):
         self.setGeometry(100, 100, 600, 400)
         self.plot_windows = []  # Keep track of plot windows
 
-        cpathRoot = os_calls.get_root_path()
-        api_key_Load = "Test key to load"
-        docker_config = cpathRoot + "/docker-compose.yml"
-        config_path = cpathRoot + "/config_loader/config.yml"
-        tickerFilePath = cpathRoot + "/src/server/listing_status.csv"
-        self.runner = yahooRunner(api_key_Load, docker_config, config_path, tickerFilePath)
+        cpath_root = os_calls.get_root_path()
+        api_key_load = "Test key to load"
+        docker_config = cpath_root + "/docker-compose.yml"
+        config_path = cpath_root + "/config_loader/config.yml"
+        ticker_file_path = cpath_root + "/src/server/listing_status.csv"
+        self.runner = Yahoorunner(api_key_load, docker_config, config_path, ticker_file_path)
 
         layout = QVBoxLayout()
 
@@ -281,13 +295,13 @@ class AppDemo(QWidget):
         self.table.setRowCount(len(tickers_list))
 
         for row_index, row in tickers_list.iterrows():
-            self.table.setItem(row_index, 0, self.create_read_only_item(row['symbol']))
-            self.table.setItem(row_index, 1, self.create_read_only_item(row['name']))
-            self.table.setItem(row_index, 2, self.create_read_only_item(row['exchange']))
-            self.table.setItem(row_index, 3, self.create_read_only_item(row['assetType']))
-            self.table.setItem(row_index, 4, self.create_read_only_item(str(row['ipoDate'])))
-            self.table.setItem(row_index, 5, self.create_read_only_item(str(row['delistingDate'])))
-            self.table.setItem(row_index, 6, self.create_read_only_item(row['status']))
+            self.table.setItem(row_index, 0, create_read_only_item(row['symbol']))
+            self.table.setItem(row_index, 1, create_read_only_item(row['name']))
+            self.table.setItem(row_index, 2, create_read_only_item(row['exchange']))
+            self.table.setItem(row_index, 3, create_read_only_item(row['assetType']))
+            self.table.setItem(row_index, 4, create_read_only_item(str(row['ipoDate'])))
+            self.table.setItem(row_index, 5, create_read_only_item(str(row['delistingDate'])))
+            self.table.setItem(row_index, 6, create_read_only_item(row['status']))
 
             watching_combobox = QComboBox()
             watching_combobox.addItems(["False", "True"])
@@ -303,11 +317,6 @@ class AppDemo(QWidget):
         if not tickers_list.empty:
             self.toggle_table_visibility(True)
             self.show()
-
-    def create_read_only_item(self, text):
-        item = QTableWidgetItem(text)
-        item.setFlags(Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsEnabled)
-        return item
 
     @asyncSlot()
     async def update_watching_status(self, row, index):
@@ -344,18 +353,10 @@ class AppDemo(QWidget):
                                    {'tickers': "A"})
         self.output.append("Ticker list stored.")
 
-    def debug_html(self, fig_html):
-        # Write the HTML to a file for debugging
-        try:
-            with open("fig_debug.html", "w", encoding="utf-8") as file:
-                file.write(fig_html)
-        except Exception as e:
-            print(f"Error writing to file: {e}")
-
     def visualize_row(self, row):
         logger.info("Visualization Started")
         all_data = self.runner.load_data(row)
-        fig_html = self.runner.plotGraph(all_data, chunk_size=10)
+        fig_html = self.runner.plot_graph(all_data, chunk_size=10)
 
 
         if fig_html is None:
@@ -363,7 +364,7 @@ class AppDemo(QWidget):
             logger.debug(fig_html)
             return
 
-        self.debug_html(fig_html)
+        debug_html(fig_html)
 
         app = QApplication.instance()
         if not app:

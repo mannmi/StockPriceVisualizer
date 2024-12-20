@@ -1,13 +1,16 @@
 services:
   python_app:
     build: .
-    command: /bin/sh -c "python server/yahoo/yahoo_db.py && sleep infinity || sleep infinity"
+    command: /bin/sh -c "python /app/src/server/yahoo/yahoo_db.py && sleep infinity || sleep infinity"
     volumes:
-      - ./src/server:/app/server
-      - ./src/os_calls:/app/os_calls
-      - ./src/config_loader:/app/config_loader
-      - ./src/marketCheck:/app/marketCheck
+      #- ./src/server:/app/server
+      #- ./src/os_calls:/app/os_calls
+      #- ./src/config_loader:/app/config_loader
+      #- ./src/marketCheck:/app/marketCheck
       - ./requirements.txt:/app/requirements.txt
+      - ./setup.py:/app/setup.py
+      - ./src/:/app/src/
+      - ./docker-compose.yml:/app/docker-compose.yml
       #- ./ui/:/app/ui/
     ports:
       - "5000:5000"
@@ -15,6 +18,7 @@ services:
       - db
     environment:
       - FLASK_RUN_HOST=0.0.0.0
+      - PYTHONPATH="$PYTHONPATH:/app/:/app/src/"
     networks:
       custom_network:
         ipv4_address: 172.20.0.2
@@ -26,12 +30,14 @@ services:
       - ./django_project:/app/django_project
       - ./ui/:/app/ui/
       - ./src:/app/src/
+      - ./docker-compose.yml:/app/docker-compose.yml
     ports:
       - "8000:8000"
     depends_on:
       - db
     environment:
       - FLASK_RUN_HOST=0.0.0.0
+      - PYTHONPATH="$PYTHONPATH:/app/:/app/src/"
     networks:
       custom_network:
         ipv4_address: 172.20.0.4
@@ -58,26 +64,6 @@ services:
     networks:
       custom_network:
         ipv4_address: 172.20.0.3
-
-  qt-app:
-    build: .
-    environment:
-      - DISPLAY=${DISPLAY}
-    command: /bin/sh -c "python appDemoAsync.py && sleep infinity || sleep infinity"
-    container_name: qt-gui-app
-    volumes:
-      - ./src/server:/app/server
-      - ./src/config_loader:/app/config_loader
-      - ./requirements.txt:/app/requirements.txt
-      - ./src/os_calls:/app/os_calls
-      - ./src/marketCheck:/app/marketCheck
-      - ./src:/app/src
-      - ./ui/:/app/ui/
-      - /tmp/.X11-unix:/tmp/.X11-unix
-    network_mode: "host"
-    devices:
-      - "/dev/dri:/dev/dri"
-    privileged: true
 
   test:
     build: .

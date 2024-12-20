@@ -15,8 +15,8 @@ logger = logging.getLogger(__name__)
 QUESTION1, QUESTION2, QUESTION3 = range(3)
 
 
-class python_bot(object):
-    async def start_comand(update, context: ContextTypes.DEFAULT_TYPE):
+class PythonBot(object):
+    async def start_comand(self, update, context: ContextTypes.DEFAULT_TYPE):
         reply_keyboard = [['True', 'False']]
         await update.message.reply_text(
             "Question 1: Is the sky blue?",
@@ -25,13 +25,14 @@ class python_bot(object):
         )
         return QUESTION1  # Set the state to QUESTION1
 
-    async def help_comand(update, context: ContextTypes.DEFAULT_TYPE):
+    async def help_comand(self,update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text(messageText.welcomeMessage)
 
-    async def handle_message(update, context) -> str:
+    async def handle_message(self,update, context) -> str:
         print(update.message.text)
+        #return update.message.text
 
-    async def handle_question1(update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    async def handle_question1(self,update, context: ContextTypes.DEFAULT_TYPE) -> int:
         user_reply = update.message.text
         if user_reply == 'True':
             await update.message.reply_text("Correct! The sky is blue.")
@@ -50,7 +51,7 @@ class python_bot(object):
         )
         return QUESTION2
 
-    async def handle_question2(update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    async def handle_question2(self,update, context: ContextTypes.DEFAULT_TYPE) -> int:
         user_reply = update.message.text
         if user_reply == 'True':
             await update.message.reply_text("Correct! Water is wet.")
@@ -69,7 +70,7 @@ class python_bot(object):
         )
         return QUESTION3
 
-    async def handle_question3(update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    async def handle_question3(self,update, context: ContextTypes.DEFAULT_TYPE) -> int:
         user_reply = update.message.text
         if user_reply == 'True':
             await update.message.reply_text("Incorrect. Fire is hot.")
@@ -92,13 +93,13 @@ if __name__ == '__main__':
 
     # Add conversation handler with the states
     conv_handler = ConversationHandler(
-        entry_points=[CommandHandler('start', python_bot.start_comand)],
+        entry_points=[CommandHandler('start', PythonBot.start_comand)],
         states={
-            QUESTION1: [MessageHandler(filters.TEXT & ~filters.COMMAND, python_bot.handle_question1)],
-            QUESTION2: [MessageHandler(filters.TEXT & ~filters.COMMAND, python_bot.handle_question2)],
-            QUESTION3: [MessageHandler(filters.TEXT & ~filters.COMMAND, python_bot.handle_question3)],
+            QUESTION1: [MessageHandler(filters.TEXT & ~filters.COMMAND, PythonBot.handle_question1)],
+            QUESTION2: [MessageHandler(filters.TEXT & ~filters.COMMAND, PythonBot.handle_question2)],
+            QUESTION3: [MessageHandler(filters.TEXT & ~filters.COMMAND, PythonBot.handle_question3)],
         },
-        fallbacks=[CommandHandler('help', python_bot.help_comand)]
+        fallbacks=[CommandHandler('help', PythonBot.help_comand)]
     )
 
     application.add_handler(conv_handler)

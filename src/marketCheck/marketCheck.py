@@ -1,16 +1,10 @@
-import pytz
-from datetime import datetime
-
-
 #Stock Market Data: For real-time stock market data, it’s best to fetch data during market hours. For the U.S. stock market, this is typically from 9:30 AM to 4:00 PM Eastern Time (ET). Adjust this based on your local time zone.
 #Historical Data: If you’re fetching historical data, you can do this at any time since the data is static and not affected by market hours.
 #News and Updates: For the latest financial news and updates, it’s good to check during market hours or just before the market opens, as significant news often breaks around these times.
-
-
 import pytz
 from datetime import datetime
 
-class marketTimeChecker:
+class Markettimechecker:
     def __init__(self, local_tz='Asia/Seoul', market_tz='America/New_York'):
         self.local_tz = pytz.timezone(local_tz)
         self.market_tz = pytz.timezone(market_tz)

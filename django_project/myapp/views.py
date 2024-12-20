@@ -1,27 +1,17 @@
 import os
-import sys
-from time import sleep
 import pandas as pd
+from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-
 from src.logging.logging_config import logger
 import src.os_calls.basic_os_calls as os_calls
-from src.server.yahoo.yahooRunner import yahooRunner
-# views.py
+from src.server.yahoo.Yahoorunner import Yahoorunner
 import logging
-from django.http import HttpResponse
-from django.shortcuts import render
-
-
-
-sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..'))
-import src.server.yahoo.yahooRunner
 
 
 if os_calls.is_running_in_docker():
-    cpathRoot = os.path.abspath("../")
+    cpathRoot = os.path.abspath("/app/")
 
 else:
     cpathRoot = os.path.abspath("")
@@ -30,7 +20,7 @@ api_key_Load = "Test key to load"
 docker_config = cpathRoot + "/docker-compose.yml"
 config_path = cpathRoot + "/config_loader/config.yml"
 tickerFilePath = cpathRoot + "/src/server/listing_status.csv"
-runner = yahooRunner(api_key_Load, docker_config, config_path, tickerFilePath)
+runner = Yahoorunner(api_key_Load, docker_config, config_path, tickerFilePath)
 
 
 
@@ -115,14 +105,14 @@ class PlotGraph(APIView):
         chunk_size = request.data.get('chunk_size', 10)
 
         all_data = runner.load_data(request)
-        fig_html = runner.plotGraph(all_data, chunk_size=10)
+        fig_html = runner.plot_graph(all_data, chunk_size=10)
 
         if fig_html is None:
             logger.info("No data to plot.")
             logger.debug(fig_html)
             return
 
-        html = runner.plotGraph(pd.DataFrame(all_data), chunk_size)
+        html = runner.plot_graph(pd.DataFrame(all_data), chunk_size)
         return Response({'fig': html})
 
 

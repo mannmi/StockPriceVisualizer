@@ -29,6 +29,10 @@ qasync
 PyQt6-WebEngine
 markdown
 django
+argparse
+django-documentation
+pytz
+setuptools
 
 
 

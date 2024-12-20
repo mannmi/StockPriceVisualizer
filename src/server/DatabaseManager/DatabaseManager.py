@@ -1,22 +1,36 @@
-import os
-import sys
-import requests
 import pandas as pd
-import plotly.express as px
 import mysql.connector
 from sqlalchemy import create_engine
-import yaml
-
-# Add the /app directory to sys.path
-# sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
-from src.config_loader.configLoader import Yml_Loader
+from src.config_loader.configLoader import YmlLoader
 from src.logging.logging_config import logger
 from src.os_calls.basic_os_calls import is_running_in_docker
-import plotly.graph_objects as go
-from plotly.subplots import make_subplots
 
 
 # Database Manager Class
+def validate_symbol_data(symbol):
+    # Ensure symbol is a Pandas Series
+    if not isinstance(symbol, pd.Series):
+        raise ValueError("symbol must be a Pandas Series")
+
+    # Extract values from the Series
+    symbol_data = symbol.to_dict()
+
+    # Convert symbol to uppercase if needed
+    if isinstance(symbol_data['symbol'], str):
+        symbol_data['symbol'] = symbol_data['symbol'].upper()
+    elif pd.isna(symbol_data['symbol']):
+        raise ValueError("symbol must be a string or a pandas Series. Every ticker has an id")
+    else:
+        raise ValueError("symbol_data['symbol'] is not a string and not NaN")
+
+    # Ensure all fields are not NaN before inserting into the database
+    for key, value in symbol_data.items():
+        if pd.isna(value):
+            symbol_data[key] = None
+
+    return symbol_data
+
+
 class DatabaseManager:
     def __init__(self, docker_config, config):
         if docker_config is None:
@@ -24,31 +38,33 @@ class DatabaseManager:
         elif config is None:
             raise ValueError("No Path provided")
 
-        db_type = 'mysql+pymysql'
+        #db_type = 'mysql+pymysql'
         # variable declaration :)
         cpath = docker_config
-        self.docker_config = Yml_Loader(cpath)
-        # self.docker_config = Yml_Loader(cpath)
+        print(cpath)
+        self.docker_config = YmlLoader(cpath)
+        print(self.docker_config.data)
+        #self.docker_config = Yml_Loader(cpath)
         if self.docker_config.data is None:
             raise ValueError("Config not loaded Properly")
         logger.info(self.docker_config.data)
 
-        dbConf = self.docker_config.data['services']['db']['environment']
-        self.user = dbConf['MYSQL_USER']
-        self.password = dbConf['MYSQL_PASSWORD']
-        self.database = dbConf['MYSQL_DATABASE']
+        db_conf = self.docker_config.data['services']['db']['environment']
+        self.user = db_conf['MYSQL_USER']
+        self.password = db_conf['MYSQL_PASSWORD']
+        self.database = db_conf['MYSQL_DATABASE']
 
         if is_running_in_docker():
             self.host = "db"
         else:
             self.host = "127.0.0.1"
 
-        hostPort, containerPort = self.docker_config.data['services']['db']['ports'][0].split(':')
-        self.port = int(hostPort)
+        host_port, container_port = self.docker_config.data['services']['db']['ports'][0].split(':')
+        self.port = int(host_port)
         self.conn = None
         self.cursor = None
         self.setup_database()
-        self.engine = engine = create_engine("mysql+pymysql://{user}:{pw}@{host}/{db}".format(host=self.host, db=self.database, user= self.user, pw=self.password))
+        self.engine = create_engine("mysql+pymysql://{user}:{pw}@{host}/{db}".format(host=self.host, db=self.database, user= self.user, pw=self.password))
         self.ticker_list_Storage = pd.DataFrame()
 
     def connect(self):
@@ -75,6 +91,10 @@ class DatabaseManager:
         rows = self.cursor.fetchall()
         columns = [desc[0] for desc in self.cursor.description]
         df = pd.DataFrame(rows, columns=columns)
+
+        # Write DataFrame to CSV
+        df.to_csv('output.csv', index=False)
+
         return df
 
     def close(self):
@@ -138,7 +158,7 @@ class DatabaseManager:
         return result
 
     def get_ticker_list(self, watcher_only=True):
-        result = []
+        #result = []
         self.connect()
         try:
             if watcher_only:
@@ -189,35 +209,12 @@ class DatabaseManager:
                ''', (symbol,))
             self.conn.commit()
         except Exception as e:
-            logger.error("An error occurred remove_from_watcher_list: {e}")
+            logger.error(f"An error occurred remove_from_watcher_list: {e}")
         finally:
             self.close()
 
-    def validate_symbol_data(self, symbol):
-        # Ensure symbol is a Pandas Series
-        if not isinstance(symbol, pd.Series):
-            raise ValueError("symbol must be a Pandas Series")
-
-        # Extract values from the Series
-        symbol_data = symbol.to_dict()
-
-        # Convert symbol to uppercase if needed
-        if isinstance(symbol_data['symbol'], str):
-            symbol_data['symbol'] = symbol_data['symbol'].upper()
-        elif pd.isna(symbol_data['symbol']):
-            raise ValueError("symbol must be a string or a pandas Series. Every ticker has an id")
-        else:
-            raise ValueError("symbol_data['symbol'] is not a string and not NaN")
-
-        # Ensure all fields are not NaN before inserting into the database
-        for key, value in symbol_data.items():
-            if pd.isna(value):
-                symbol_data[key] = None
-
-        return symbol_data
-
     def update_symbol(self, symbol):
-        symbol_data = self.validate_symbol_data(symbol)
+        symbol_data = validate_symbol_data(symbol)
 
         try:
             self.connect()
@@ -268,7 +265,7 @@ class DatabaseManager:
         return result
 
     def store_symbol(self, symbol):
-        symbol_data = self.validate_symbol_data(symbol)
+        symbol_data = validate_symbol_data(symbol)
 
         try:
             self.connect()

@@ -1,23 +1,22 @@
+import argparse
+import logging
 import os
 import sys
+#sys.path.append(os.path.join(os.path.dirname(__file__), '/app/'))
+from src.logging.logging_config import logger, set_log_level
 import pandas as pd
-from numpy.f2py.auxfuncs import throw_error
-
-# config.yml
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '/app/')))
-from src.logging.logging_config import logger
 from src.server.DatabaseManager.DatabaseManager import DatabaseManager
-from src.config_loader.configLoader import Yml_Loader
+from src.config_loader.configLoader import YmlLoader
 from src.server.yahoo.dataProcesingYahoo import DataProcessorYahoo
-from src.os_calls.basic_os_calls import clear
+from src.os_calls.basic_os_calls import clear, is_running_in_docker
 
 logger.info("MySQL Connector is installed and working!")
 
 
 class Yahoo(DatabaseManager):
-    def __init__(self, docker_config, api_key, tickerFilePath):
-        super().__init__(docker_config, api_key)
-        self.tickerFilePath = tickerFilePath
+    def __init__(self, docker_config_arg, api_key, ticker_file_path_arg):
+        super().__init__(docker_config_arg, api_key)
+        self.tickerFilePath = ticker_file_path_arg
 
     def store_data(self, symbol, df):
         # Process the data using the DataProcessor class
@@ -81,8 +80,6 @@ class Yahoo(DatabaseManager):
 
     # Fetch and store data for multiple tickers
     def fetch_and_store_symbol(self, tickers, api_key):
-        configAuth = Yml_Loader('./config.yml')
-
         if tickers.empty:
             raise ValueError("The list of tickers is empty. Please provide at least one ticker symbol.")
 
@@ -126,10 +123,10 @@ class Yahoo(DatabaseManager):
         if tickers.empty:
             raise ValueError("The list of tickers is empty. Please provide at least one ticker symbol.")
 
-        DataProcessorVar = DataProcessorYahoo(tickers, self.tickerFilePath)
+        data_processor_var = DataProcessorYahoo(tickers, self.tickerFilePath)
         for index, ticker in watcher_list.iterrows():
-            DataProcessorVar.ticker = ticker["symbol"]
-            data_store = DataProcessorVar.process_data()
+            data_processor_var.ticker = ticker["symbol"]
+            data_store = data_processor_var.process_data()
             clear()
             # print(data_store.columns.tolist())
             print(data_store)
@@ -159,12 +156,16 @@ if __name__ == "__main__":
         logger.info(f"Using configuration file: {args.config}")
 
     logger.info("starting the run")
+    if is_running_in_docker():
+        cpath_root = os.path.abspath("/app/")
+    else:
+        cpath_root = os.path.abspath("../../../")
 
     api_key_Load = 'your_api_key_here'  # Replace with your actual API key
-    docker_config = '/app/docker-compose.yml'
-    config_path = "/app/config_loader/config.yml"
-    tickerFilePath = "/app/server/listing_status.csv"
-    config = Yml_Loader(docker_config)
+    docker_config = cpath_root + '/docker-compose.yml'
+    config_path = cpath_root + "/src/config_loader/config.yml"
+    tickerFilePath = cpath_root + "/src/server/listing_status.csv"
+    config = YmlLoader(docker_config)
 
     print("get tickets")
     dataProcessor = DataProcessorYahoo("A", tickerFilePath)
@@ -177,9 +178,7 @@ if __name__ == "__main__":
     db_manager.fetch_and_store_symbol(tickers_list, api_key_Load)
 
     print("Storing Data in Database")
-    # tickers_list = db_manager.get_ticker_list()
-    # db_manager.fetch_and_store_symbol(tickers_list, 0)
     ticker_list = db_manager.get_ticker_list()
-    # print(ticker_list)
-    # db_manager.fetch_and_store_data(tickers_list, api_key_Load)
+    #db_manager.fetch_and_store_data(tickers_list, api_key_Load)
+    #
 

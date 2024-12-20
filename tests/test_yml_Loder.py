@@ -6,10 +6,10 @@
 
 import unittest
 import os
-from src.config_loader.configLoader import Yml_Loader
+from src.config_loader.configLoader import YmlLoader
 
 
-class Test_yml_Loader(unittest.TestCase):
+class TestYmlLoader(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         print(f"======== {cls.__name__}========")
@@ -20,12 +20,12 @@ class Test_yml_Loader(unittest.TestCase):
         test_file = "/app/tests/TestData/tmpConfig.yml"
         # use os to copy the file
         os.system(f'cp {conf} {test_file}')
-        self.ymlLoader = Yml_Loader(test_file)
+        self.ymlLoader = YmlLoader(test_file)
 
     def test_yml_loader_data(self):
         print(f"Running test ====> {self._testMethodName}")
-        dataRead = self.ymlLoader.data
-        refString = {'System': {'ProjectRoot': 'F:\\PycharmProjects\\TPRO', 'chunksize': '10 ** 1', 'delimiter': ';',
+        data_read = self.ymlLoader.data
+        ref_string = {'System': {'ProjectRoot': 'F:\\PycharmProjects\\TPRO', 'chunksize': '10 ** 1', 'delimiter': ';',
                                 'encoding': 'utf-8', 'lineterminator': '\\n', 'projectRoot_file': 'appDemoAsync.py'},
                      'acceskeys': {'HUGGINGFACE_TOKEN': 'hf_testtoken'}, 'bertModel': [
                 {'filter': {'model_name': 'unitary/unbiased-toxic-roberta', 'model_path': '/models/filtration_model'}}],
@@ -37,19 +37,19 @@ class Test_yml_Loader(unittest.TestCase):
                                                        'GPT2Tokenizer': 'dbmdz/german-gpt2',
                                                        'model_name': 'dbmdz/german-gpt2',
                                                        'model_path': 'models/german-gpt2'}}]}
-        self.assertEqual(dataRead, refString)
+        self.assertEqual(data_read, ref_string)
 
     def test_yml_loader_keyAcces(self):
         print(f"Running test ====> {self._testMethodName}")
-        dataRead = self.ymlLoader.data['System']['delimiter']
-        refString = ';'
-        self.assertEqual(dataRead, refString)
+        data_read = self.ymlLoader.data['System']['delimiter']
+        ref_string = ';'
+        self.assertEqual(data_read, ref_string)
 
     def test_yml_loader_changeKey(self):
         print(f"Running test ====> {self._testMethodName}")
-        dataRead = self.ymlLoader.data['System']['delimiter']
-        refString = ';'
-        self.assertEqual(dataRead, refString)
+        data_read = self.ymlLoader.data['System']['delimiter']
+        ref_string = ';'
+        self.assertEqual(data_read, ref_string)
 
 
 if __name__ == '__main__':

@@ -1,5 +1,4 @@
 import logging
-
 import os
 
 def set_log_level(level):
@@ -13,5 +12,4 @@ else:
     logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
     logger = logging.getLogger(__name__)
 
-#logger.info('This is a test log message')
-
+logger.info('This is a test log message')

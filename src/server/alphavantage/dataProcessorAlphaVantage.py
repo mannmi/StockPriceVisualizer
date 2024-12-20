@@ -1,15 +1,5 @@
-import os
-import sys
-
 import pandas as pd
-import matplotlib.pyplot as plt
-from datetime import timedelta
-
 import requests
-
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '/app/')))
-from marketCheck.marketCheck import marketTimeChecker
-from server.yahoo.fetchYahoo import DataFetcher
 
 
 class DataProcessorAlphaVantage:
@@ -23,7 +13,7 @@ class DataProcessorAlphaVantage:
     #   see how it was implemneted in fetchYahoo.py
     def process_data(self,tickers):
         url = 'https://www.alphavantage.co/query'
-        configAuth = Yml_Loader('./config.yml')
+        #configAuth = Yml_Loader('./config.yml')
 
         if not tickers:
             raise ValueError("The list of tickers is empty. Please provide at least one ticker symbol.")
@@ -60,4 +50,7 @@ class DataProcessorAlphaVantage:
                         print(f"Error for {ticker}: {data['Error Message']}")
                     else:
                         print(f"Unexpected response for {ticker}: {data}")
+            finally:
+                print("Error occured in data Processing")
+                exit(1000)
 
