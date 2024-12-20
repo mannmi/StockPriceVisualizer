@@ -26,7 +26,7 @@ def modify_activation_script(venv_dir):
             f.write('\nexport PYTHONPATH=$PYTHONPATH:$VIRTUAL_ENV/app:$VIRTUAL_ENV/app/src\n')
 
 
-def create_and_activate_venv(venv_dir):
+def create_venv(venv_dir):
     if not os.path.exists(venv_dir):
         venv.create(venv_dir, with_pip=True)
         print(f"Virtual environment created at {venv_dir}")
@@ -35,27 +35,31 @@ def create_and_activate_venv(venv_dir):
 
     modify_activation_script(venv_dir)
 
-    if platform.system() == "Windows":
-        activate_script = os.path.join(venv_dir, 'Scripts', 'activate.bat')
-        subprocess.run([activate_script], shell=True)
-    else:
-        activate_script = os.path.join(venv_dir, 'bin', 'activate')
-        subprocess.run(['source', activate_script], shell=True)
-
-    print(f"Virtual environment activated")
-
 
 def upgrade_pip(venv_dir):
-    subprocess.check_call([os.path.join(venv_dir, 'Scripts', 'python'), '-m', 'pip', 'install', '--upgrade', 'pip'])
+    python_executable = os.path.join(venv_dir, 'Scripts', 'python') if platform.system() == "Windows" else os.path.join(
+        venv_dir, 'bin', 'python')
+    subprocess.check_call([python_executable, '-m', 'pip', 'install', '--upgrade', 'pip'])
     print("Upgraded pip")
 
 
+def install_mysqlclient(venv_dir):
+    python_executable = os.path.join(venv_dir, 'Scripts', 'python') if platform.system() == "Windows" else os.path.join(
+        venv_dir, 'bin', 'python')
+    try:
+        subprocess.check_call([python_executable, '-m', 'pip', 'install', 'mysqlclient'])
+        print("Installed mysqlclient")
+    except subprocess.CalledProcessError as e:
+        print(f"Error installing mysqlclient: {e}")
+
+
 def install_requirements(venv_dir):
+    python_executable = os.path.join(venv_dir, 'Scripts', 'python') if platform.system() == "Windows" else os.path.join(
+        venv_dir, 'bin', 'python')
     if os.path.exists('requirements.txt'):
         for _ in range(3):  # Retry up to 3 times
             try:
-                subprocess.check_call(
-                    [os.path.join(venv_dir, 'Scripts', 'python'), '-m', 'pip', 'install', '-r', 'requirements.txt'])
+                subprocess.check_call([python_executable, '-m', 'pip', 'install', '-r', 'requirements.txt'])
                 print("Installed packages from requirements.txt")
                 break
             except subprocess.CalledProcessError as e:
@@ -69,25 +73,48 @@ def install_requirements(venv_dir):
 
 def setup_linux(venv_dir):
     print("Setting up on Linux")
-    create_and_activate_venv(venv_dir)
+    # Install MySQL client libraries
+    subprocess.check_call(
+        ['sudo', 'apt-get', 'install', '-y', 'python3-dev', 'default-libmysqlclient-dev', 'build-essential'])
+
+    create_venv(venv_dir)
     upgrade_pip(venv_dir)
-    #purge_packages(venv_dir)
+    install_mysqlclient(venv_dir)
     install_requirements(venv_dir)
 
 
 def setup_mac(venv_dir):
     print("Setting up on macOS")
-    create_and_activate_venv(venv_dir)
+    # Install Homebrew if not installed
+    try:
+        subprocess.check_call(
+            ['/bin/bash', '-c', '"$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"'])
+    except subprocess.CalledProcessError:
+        print("Homebrew is already installed")
+
+    # Add Homebrew to PATH and install MySQL client libraries
+    subprocess.check_call(['/bin/bash', '-c', 'echo \'eval "$(/opt/homebrew/bin/brew shellenv)"\' >> ~/.zshrc'])
+    subprocess.check_call(['/bin/bash', '-c', 'source ~/.zshrc'])
+    subprocess.check_call(['brew', 'install', 'mysql-client'])
+    subprocess.check_call(
+        ['/bin/bash', '-c', 'echo \'export PATH="/usr/local/opt/mysql-client/bin:$PATH"\' >> ~/.zshrc'])
+    subprocess.check_call(
+        ['/bin/bash', '-c', 'echo \'export LDFLAGS="-L/usr/local/opt/mysql-client/lib"\' >> ~/.zshrc'])
+    subprocess.check_call(
+        ['/bin/bash', '-c', 'echo \'export CPPFLAGS="-I/usr/local/opt/mysql-client/include"\' >> ~/.zshrc'])
+    subprocess.check_call(['/bin/bash', '-c', 'source ~/.zshrc'])
+
+    create_venv(venv_dir)
     upgrade_pip(venv_dir)
-    #purge_packages(venv_dir)
+    install_mysqlclient(venv_dir)
     install_requirements(venv_dir)
 
 
 def setup_windows(venv_dir):
     print("Setting up on Windows")
-    create_and_activate_venv(venv_dir)
+    create_venv(venv_dir)
     upgrade_pip(venv_dir)
-    #purge_packages(venv_dir)
+    install_mysqlclient(venv_dir)
     install_requirements(venv_dir)
 
 
