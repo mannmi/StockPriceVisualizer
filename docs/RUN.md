@@ -24,6 +24,51 @@ Open your web browser and go to http://127.0.0.1:8000/ to see your Django projec
 
 # Start Up UI
 
+## Start venv environment
+
+### On Windows
+
+```cmd
+venv\Scripts\activate
+```
+
+### On macOS/Linux
+
+```bash
+source venv/bin/activate
+```
+
+## Add PYTHONPATH
+
+---
+
+### On Windows
+
+Option 1)
+
+(power shell)
+```bash
+  $env:PYTHONPATH = "$env:PYTHONPATH;.\app;.\app\src"
+```
+(cmd)
+```bash
+  set PYTHONPATH=%PYTHONPATH%;.\app;.\app\src
+```
+
+### On Linux
+```bash
+  export PYTHONPATH=$PYTHONPATH:/app/:/app/src/
+```
+
+---
+
+Option 2)
+````bash
+python setup.sh
+````
+
+---
+
 ## Start the enviroment
 set PYTHONPATH=%PYTHONPATH%;C:\path\to\your\venv
 
