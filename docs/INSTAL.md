@@ -37,7 +37,7 @@ It's a good practice to use a virtual environment to manage dependencies.
 pip install virtualenv
 
 # Create a virtual environment
-python -m venv venv
+python -m venv .venv
 ```
 
 ### Activate the Virtual Environment
@@ -45,13 +45,13 @@ python -m venv venv
 #### On Windows
 
 ```cmd
-venv\Scripts\activate
+.\.venv\Scripts\activate
 ```
 
 #### On macOS/Linux
 
 ```bash
-source venv/bin/activate
+source ./.venv/bin/activate
 ```
 
 ## 3. Install Dependencies
@@ -108,7 +108,7 @@ Make sure you have Python and Pip installed on your system. You can download Pyt
 pip install virtualenv
 
 # Create a virtual environment
-python -m venv venv
+python -m venv .venv
 ```
 
 ## 3. Activate the Virtual Environment
@@ -116,13 +116,13 @@ python -m venv venv
 #### On Windows
 
 ```cmd
-venv\Scripts\activate
+.\.venv\Scripts\activate
 ```
 
 #### On macOS/Linux
 
 ```bash
-source venv/bin/activate
+source ./.venv/bin/activate
 ```
 
 ## 4. Install Dependencies
