@@ -19,7 +19,7 @@ Install docker = https://docs.docker.com/engine/install/
 
 ---
 
-# Install Django Project (deprecated)
+# Install Django Project venv (deprecated)
 
 <Details>
 There is a docker container you can use (django_app)
@@ -88,15 +88,20 @@ python manage.py migrate
 
 </Details>
 
+---
+
 # Installing Ui enviroment
 
-## 1. Install Python and Pip
+Install Python and Pip
 
 Make sure you have Python and Pip installed on your system. You can download Python from python.org.
 
-## 2. Set Up a Virtual Environment
 
-It's a good practice to use a virtual environment to manage dependencies.
+## Install manually
+<Details>
+
+## 1. Set Up a Virtual Environment
+
 
 ```bash
 # Install virtualenv if you don't have it
@@ -106,7 +111,7 @@ pip install virtualenv
 python -m venv venv
 ```
 
-### Activate the Virtual Environment
+## 3. Activate the Virtual Environment
 
 #### On Windows
 
@@ -120,11 +125,47 @@ venv\Scripts\activate
 source venv/bin/activate
 ```
 
-## 3. Install Dependencies
+## 4. Install Dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
+
+## 4. Add PYTHONPATH
+
+---
+
+### 4.1 On Windows
+
+(power shell)
+```bash
+  $env:PYTHONPATH = "$env:PYTHONPATH;.\app;.\app\src"
+```
+(cmd)
+```bash
+  set PYTHONPATH=%PYTHONPATH%;.\app;.\app\src
+```
+
+### 4.2 On Linux
+```bash
+  export PYTHONPATH=$PYTHONPATH:/app/:/app/src/
+```
+
+---
+
+</Details>
+
+## Install using setup.py
+<Details>
+
+### Run setup
+```bash
+python ./setup.py
+```
+
+
+
+</Details>
 
 ---
 

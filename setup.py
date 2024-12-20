@@ -17,7 +17,7 @@ def modify_activation_script(venv_dir):
 
 
 def create_and_activate_venv():
-    venv_dir = 'venv'
+    venv_dir = '.venv'
     if not os.path.exists(venv_dir):
         venv.create(venv_dir, with_pip=True)
         print(f"Virtual environment created at {venv_dir}")
@@ -36,19 +36,38 @@ def create_and_activate_venv():
     print(f"Virtual environment activated")
 
 
+def upgrade_pip():
+    subprocess.check_call([sys.executable, '-m', 'pip', 'install', '--upgrade', 'pip'])
+    print("Upgraded pip")
+
+
+def install_requirements():
+    if os.path.exists('requirements.txt'):
+        subprocess.check_call([sys.executable, '-m', 'pip', 'install', '-r', 'requirements.txt'])
+        print("Installed packages from requirements.txt")
+    else:
+        print("requirements.txt not found")
+
+
 def setup_linux():
     print("Setting up on Linux")
     create_and_activate_venv()
+    upgrade_pip()
+    install_requirements()
 
 
 def setup_mac():
     print("Setting up on macOS")
     create_and_activate_venv()
+    upgrade_pip()
+    install_requirements()
 
 
 def setup_windows():
     print("Setting up on Windows")
     create_and_activate_venv()
+    upgrade_pip()
+    install_requirements()
 
 
 def main():

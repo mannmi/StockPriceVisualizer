@@ -38,42 +38,8 @@ venv\Scripts\activate
 source venv/bin/activate
 ```
 
-## Add PYTHONPATH
 
----
-
-### On Windows
-
-Option 1)
-
-(power shell)
-```bash
-  $env:PYTHONPATH = "$env:PYTHONPATH;.\app;.\app\src"
-```
-(cmd)
-```bash
-  set PYTHONPATH=%PYTHONPATH%;.\app;.\app\src
-```
-
-### On Linux
-```bash
-  export PYTHONPATH=$PYTHONPATH:/app/:/app/src/
-```
-
----
-
-Option 2)
-````bash
-python setup.sh
-````
-
----
-
-## Start the enviroment
-set PYTHONPATH=%PYTHONPATH%;C:\path\to\your\venv
-
-
-Run the UI application with:
+### Run the UI application with:
 
 ```bash
 python ui/appDemoAsync.py
