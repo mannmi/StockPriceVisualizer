@@ -155,7 +155,7 @@ pip install -r requirements.txt
 
 </Details>
 
-## Install using setup.py
+## Install using setup.py (Recommended)
 <Details>
 
 ### Run setup
