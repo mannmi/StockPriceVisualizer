@@ -6,7 +6,7 @@ docker-compose up --build
 
 ---
 
-### Run the Development Server (deprecated see install.md)
+### Run the Development Server (deprecated)
 
 <details>
 Start the Django development server.
@@ -29,13 +29,13 @@ Open your web browser and go to http://127.0.0.1:8000/ to see your Django projec
 ### On Windows
 
 ```cmd
-venv\Scripts\activate
+.\.venv\Scripts\activate
 ```
 
 ### On macOS/Linux
 
 ```bash
-source venv/bin/activate
+source ./.venv/bin/activate
 ```
 
 
