@@ -24,7 +24,7 @@ services:
         ipv4_address: 172.20.0.2
   django_app:
     build: .
-    command: /bin/sh -c "sleep 5 && /app/django_project/run.sh || sleep infinity"
+    command: /bin/sh -c "chmod +x /app/django_project/run.sh && sleep 5 && /app/django_project/run.sh || sleep infinity"
     volumes:
       - ./requirements.txt:/app/requirements.txt
       - ./django_project:/app/django_project
