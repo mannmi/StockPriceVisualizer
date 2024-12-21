@@ -1,5 +1,7 @@
 import sys
 import asyncio
+from time import sleep
+
 import requests
 import pandas as pd
 from PyQt6.QtWidgets import (
@@ -91,6 +93,7 @@ class AppDemo(QWidget):
         self.plot_windows = []  # Keep track of plot windows
 
         cpath_root = os_calls.get_root_path()
+        print(cpath_root)
         api_key_load = "Test key to load"
         docker_config = cpath_root + "/docker-compose.yml"
         config_path = cpath_root + "/config_loader/config.yml"

@@ -18,9 +18,23 @@ ENV PATH="/opt/venv/bin:$PATH"
 COPY requirements.txt /app/requirements.txt
 
 RUN apt-get update && apt-get upgrade -y
+
+RUN apt-get update && apt-get install -y \
+    libsdl2-dev \
+    libavcodec-dev \
+    libavdevice-dev \
+    libavfilter-dev \
+    libavformat-dev \
+    libavutil-dev \
+    libswscale-dev \
+    libswresample-dev \
+    libpostproc-dev
+
 # Upgrade pip and install required python packages
 RUN pip install --upgrade pip
+RUN pip install sip
 RUN pip install --trusted-host pypi.python.org -r requirements.txt
+
 RUN apt install vim -y
 
 # Install dependencies

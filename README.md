@@ -23,6 +23,9 @@ StockPriceVisualizer: 📈 Dive into the world of stock prices with real-time vi
 - Server (API) for fetching data and updating said data
 - UI/API usage
 
+--- 
+## <font color="red"> UI Setup Script tested for Ubunut 24.04 LTS (Fresh Install) Only </font>
+
 ---
 
 ## Installation

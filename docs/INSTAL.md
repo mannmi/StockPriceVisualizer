@@ -160,7 +160,7 @@ pip install -r requirements.txt
 
 ### Run setup
 ```bash
-python setup.py --venv .venv
+python ./setup/setup.py --venv .venv
 ```
 
 

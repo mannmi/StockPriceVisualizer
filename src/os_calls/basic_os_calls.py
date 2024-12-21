@@ -15,11 +15,30 @@ def clear():
     else:
         _ = system('clear')
 
+    ## @brief Find the project root directory.
+    #  @return The path to the project root directory.
+
+
+def find_project_root():
+    # Start at the current directory
+    path = os.getcwd()
+
+    # Keep going up until we find the main.py file
+    while not os.path.isfile(os.path.join(path, '.gitignore')):
+        new_path = os.path.dirname(path)
+        if new_path == path:
+            # We've reached the root of the filesystem, so the project root was not found
+            return None
+        path = new_path
+    # Return the directory that contains setup.py
+    return path
+
+
 def get_root_path():
     if is_running_in_docker():
-        cpath_root = os.path.abspath("")
+        cpath_root = os.path.abspath("/app/")
     else:
-        cpath_root = os.path.abspath("../")
+        cpath_root = find_project_root()
 
     return cpath_root
 
@@ -40,10 +59,9 @@ def is_running_in_docker():
     except FileNotFoundError:
         return False
 
-#how to run it :)
+# how to run it :)
 # if is_running_in_docker():
 #     logger.info("Running inside a Docker container")
 # else:
 #     logger.info("Not running inside a Docker container")
 #
-
