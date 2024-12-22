@@ -15,7 +15,8 @@
 
 # Stock Price Visualizer
 
-StockPriceVisualizer: 📈 Dive into the world of stock prices with real-time visualizations and insights. Perfect for traders, investors, and finance enthusiasts!
+StockPriceVisualizer: 📈 Dive into the world of stock prices with real-time visualizations and insights. Perfect for
+traders, investors, and finance enthusiasts!
 
 ## "Features"
 
@@ -24,6 +25,7 @@ StockPriceVisualizer: 📈 Dive into the world of stock prices with real-time vi
 - UI/API usage
 
 --- 
+
 ## <font color="red"> UI Setup Script tested for Ubunut 24.04 LTS (Fresh Install) Only </font>
 
 ---
@@ -38,17 +40,18 @@ For a guide on how to run the application, refer to [docs/RUN.md](docs/RUN.md)
 
 ## User Guide
 
-For a guide on the button functionality, please read the [User Guide](docs/USING_APP.md)  
+For a guide on the button functionality, please read the [User Guide](docs/USING_APP.md)
 
 ---
 
 ### API Documentation
 
-For a short explanation of the Django API created, refer to API Documentation.  
+For a short explanation of the Django API created, refer to API Documentation.
 
 API Documentation => [API Documentation LINK](docs/API_DOCUMENTATION.md)
 
 Or run the web server (use the IP of the server):
+
 - http://127.0.0.1:8000/api/rawDocumentation/
 - http://127.0.0.1:8000/documentation/
 
@@ -56,7 +59,7 @@ Or run the web server (use the IP of the server):
 
 ## Contributing
 
-Contributions are welcome! Please see the CONTRIBUTING.md, COMMIT_MESSAGE.md, and CODE_OF_CONDUCT.md for guidelines.  
+Contributions are welcome! Please see the CONTRIBUTING.md, COMMIT_MESSAGE.md, and CODE_OF_CONDUCT.md for guidelines.
 
 * [CONTRIBUTING.md](docs/CONTRIBUTING.md)
 * [COMMIT_MESSAGE.md](docs/COMMIT_MESSAGE.md)
@@ -64,17 +67,23 @@ Contributions are welcome! Please see the CONTRIBUTING.md, COMMIT_MESSAGE.md, an
 
 ## TODO List
 
-- [ ] Fix database scraper (there still seems to be an issue with the function `fetch_active_period`). For now, it is commented out, but fixing it would improve performance when updating the database.
-- [ ] Switch the graph rendering for the table; it's kind of bad. (Qt web seems to be broken on my system, so I can't test it. It now opens a browser tab instead.)
+- [ ] Fix database scraper (there still seems to be an issue with the function `fetch_active_period`). For now, it is
+  commented out, but fixing it would improve performance when updating the database.
+- [ ] Switch the graph rendering for the table; it's kind of bad. (Qt web seems to be broken on my system, so I can't
+  test it. It now opens a browser tab instead.)
 - [ ] Fix filter rules
 - [ ] There is currently no protection against race conditions (The watch list load has to be manually triggered).
-
+- [ ] TODO Split the Requirements.txt into separate files (This will make the installation of the ui Simpler as it does
+  not need mysql handeler)
+- [ ] TODO fix the Historical Data storage, Bug with storing older Data. Data only store for the last x Month but more
+  data is fetched.
+- [ ] Add Doxygen Documentation.
 
 --- 
 
 ## License
 
-This project is licensed under the AGPL3 License. See the LICENSE file for details.  
+This project is licensed under the AGPL3 License. See the LICENSE file for details.
 
 License => [https://github.com/mannmi/StockPriceVisualizer?tab=LGPL-2.1-1-ov-file](https://github.com/mannmi/StockPriceVisualizer/blob/main/LICENSE)
 
