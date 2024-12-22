@@ -12,7 +12,7 @@ from PyQt6.QtCore import Qt, QThread, pyqtSignal
 from qasync import QEventLoop, asyncSlot
 from src.logging.logging_config import logger
 import src.os_calls.basic_os_calls as os_calls
-from ui.PlotWindow import PlotWindow, has_redner_failed, open_in_browser
+from src.ui.PlotWindow import PlotWindow, has_redner_failed, open_in_browser
 
 
 class RenderThread(QThread):
@@ -74,7 +74,7 @@ def create_read_only_item(text):
 def debug_html(fig_html):
     # Write the HTML to a file for debugging
     try:
-        with open("fig_debug.html", "w", encoding="utf-8") as file:
+        with open("./tmp_html/fig_debug.html", "w", encoding="utf-8") as file:
             file.write(fig_html)
     except Exception as e:
         print(f"Error writing to file: {e}")
