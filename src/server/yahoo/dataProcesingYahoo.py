@@ -122,7 +122,7 @@ class DataProcessorYahoo(DataProcessor):
         fig.add_trace(go.Scatter(x=data.index, y=data['open'], mode='lines', name='Open'), row=1, col=1)
 
         # Add trace for volume data
-        fig.add_trace(go.Bar(x=data.index, y=data['volume'], name='Volume'), row=2, col=1)
+        fig.add_trace(go.Scatter(x=data.index, y=data['volume'], name='Volume'), row=2, col=1)
 
         # Update layout to enable zoom and pan
         fig.update_layout(title='Stock Data', xaxis_title='Time', yaxis_title='Price (USD)',

@@ -1,7 +1,7 @@
+import html
+import json
 import sys
 import asyncio
-from time import sleep
-
 import requests
 import pandas as pd
 from PyQt6.QtWidgets import (
@@ -10,24 +10,19 @@ from PyQt6.QtWidgets import (
 )
 from PyQt6.QtCore import Qt, QThread, pyqtSignal
 from qasync import QEventLoop, asyncSlot
-
 from src.logging.logging_config import logger
 import src.os_calls.basic_os_calls as os_calls
-from src.server.yahoo.Yahoorunner import Yahoorunner
-from ui.PlotWindow import PlotWindow
-
-
-# from src/ import yahooRunner
+from ui.PlotWindow import PlotWindow, has_redner_failed, open_in_browser
 
 
 class RenderThread(QThread):
     update_progress = pyqtSignal(int)
     render_complete = pyqtSignal(object)
 
-    def __init__(self, runner, filters, watcher=True, fetch_from_file=False):
+    def __init__(self, filters, watcher=True, fetch_from_file=False):
         super().__init__()
         self.fetchFromFile = fetch_from_file
-        self.runner = runner
+        # self.runner = runner
         self.filters = filters
         self.watcher = watcher
 
@@ -98,7 +93,7 @@ class AppDemo(QWidget):
         docker_config = cpath_root + "/docker-compose.yml"
         config_path = cpath_root + "/config_loader/config.yml"
         ticker_file_path = cpath_root + "/src/server/listing_status.csv"
-        self.runner = Yahoorunner(api_key_load, docker_config, config_path, ticker_file_path)
+        # self.runner = Yahoorunner(api_key_load, docker_config, config_path, ticker_file_path)
 
         layout = QVBoxLayout()
 
@@ -356,29 +351,83 @@ class AppDemo(QWidget):
                                    {'tickers': "A"})
         self.output.append("Ticker list stored.")
 
-    def visualize_row(self, row):
+    # todo rewrtite all functions to use a api_call handler instead
+    async def api_call(self, endpoint, payload, expect_html=False):
+        url = f'http://127.0.0.1:8000/{endpoint}'
+
+        loop = asyncio.get_event_loop()
+        response = await loop.run_in_executor(None, lambda: requests.post(url, json=payload))
+
+        if response.status_code == 200:
+            if expect_html:
+                # Print the raw response content for debugging
+                logger.info("Raw HTML response content:", response.content)
+                logger.info("Decoded HTML response content:", response.text)
+            else:
+                # Print the raw JSON response for debugging
+                logger.info("Raw JSON response content:", response.content)
+            return response
+        else:
+            logger.error(f"Error: Received status code {response.status_code}")
+            return None
+
+    @asyncSlot()
+    async def visualize_row(self, row):
         logger.info("Visualization Started")
-        all_data = self.runner.load_data(row)
-        fig_html = self.runner.plot_graph(all_data, chunk_size=10)
 
+        # Convert Series to dictionary and serialize using TickerSerializer
+        payload = {'tickers': row.to_dict()}
 
-        if fig_html is None:
-            logger.info("No data to plot.")
-            logger.debug(fig_html)
+        logger.info("Serialized JSON:")
+        logger.info(json.dumps(payload))
+
+        # Asynchronous call to load_data API
+        all_data_bytes = await self.api_call('api/load_data/', payload)
+
+        # Decode byte strings and parse JSON data
+        json_str = ''.join([data.decode('utf-8') for data in all_data_bytes])
+        all_data = pd.DataFrame(json.loads(json_str))
+
+        if all_data.empty:
+            logger.info("No data returned")
             return
 
+        # Asynchronous call to plot_graph API
+        fig_html_response = await self.api_call(
+            'api/plot_graph/',
+            {'all_data': all_data.to_dict(orient='records'), 'chunk_size': 10}
+        )
+
+        if fig_html_response.status_code != 200:
+            logger.error(f"Error: Received status code {fig_html_response.status_code}")
+            return
+
+        fig_html = html.unescape(fig_html_response.text)
+
+        # Debug HTML content (optional)
         debug_html(fig_html)
 
+        # Check if Qt rendering has previously failed
+        if has_redner_failed():
+            open_in_browser(fig_html, row["symbol"])
+            return
+
+        # Initialize Qt application if not already running
         app = QApplication.instance()
         if not app:
             app = QApplication(sys.argv)
 
-        plot_window = PlotWindow(fig_html)
+        plot_window = PlotWindow(fig_html, row["symbol"])
         plot_window.show()
         self.plot_windows.append(plot_window)  # Keep a reference
 
-        if not QApplication.instance():
-            app.exec()
+        if not has_redner_failed():
+            if not QApplication.instance():
+                app.exec()
+
+
+async def run_visualize(self, row):
+    await self.visualize_row(row)
 
 
 def main():

@@ -33,6 +33,7 @@ argparse
 django-documentation
 pytz
 setuptools
+django-serializers
 
 
 
