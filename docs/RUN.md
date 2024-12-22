@@ -42,7 +42,7 @@ source ./.venv/bin/activate
 ### Run the UI application with:
 
 ```bash
-python ui/appDemoAsync.py
+python src/ui/appDemoAsync.py
 ```
 
 ---

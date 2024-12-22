@@ -4,7 +4,7 @@
 
 <p align="center">
   <!-- PSE Acceleration Program logo -->
-  <img width=40% src="docs/images/screenImage.png">
+  <img width=40% src="images/screenImage.png">
 </p>
 
 <p align="center">
@@ -32,15 +32,15 @@ traders, investors, and finance enthusiasts!
 
 ## Installation
 
-For a guide on how to install the application, refer to [docs/INSTAL.md](docs/INSTAL.md)
+For a guide on how to install the application, refer to [docs/INSTAL.md](INSTAL.md)
 
 ## Starting Server (API)/DB/UI
 
-For a guide on how to run the application, refer to [docs/RUN.md](docs/RUN.md)
+For a guide on how to run the application, refer to [docs/RUN.md](RUN.md)
 
 ## User Guide
 
-For a guide on the button functionality, please read the [User Guide](docs/USING_APP.md)
+For a guide on the button functionality, please read the [User Guide](USING_APP.md)
 
 ---
 
@@ -48,7 +48,7 @@ For a guide on the button functionality, please read the [User Guide](docs/USING
 
 For a short explanation of the Django API created, refer to API Documentation.
 
-API Documentation => [API Documentation LINK](docs/API_DOCUMENTATION.md)
+API Documentation => [API Documentation LINK](API_DOCUMENTATION.md)
 
 Or run the web server (use the IP of the server):
 
@@ -61,9 +61,9 @@ Or run the web server (use the IP of the server):
 
 Contributions are welcome! Please see the CONTRIBUTING.md, COMMIT_MESSAGE.md, and CODE_OF_CONDUCT.md for guidelines.
 
-* [CONTRIBUTING.md](docs/CONTRIBUTING.md)
-* [COMMIT_MESSAGE.md](docs/COMMIT_MESSAGE.md)
-* [CODE_OF_CONDUCT.md](docs/CODE_OF_CONDUCT.md)
+* [CONTRIBUTING.md](CONTRIBUTING.md)
+* [COMMIT_MESSAGE.md](COMMIT_MESSAGE.md)
+* [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)
 
 ## TODO List
 
