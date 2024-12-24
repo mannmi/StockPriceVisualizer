@@ -32,8 +32,8 @@ argparse
 django-documentation
 pytz
 setuptools
-django-serializers
-venv
+#django-serializers
+#venv
 
 
 

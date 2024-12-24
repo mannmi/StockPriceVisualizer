@@ -1,8 +1,11 @@
+import math
+import time
 from datetime import timedelta
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import pandas as pd
 from src.marketCheck.marketCheck import Markettimechecker
+from src.os_calls.basic_os_calls import get_root_path
 from src.server.yahoo.fetchYahoo import DataFetcher
 from src.server.DatabaseManager.dataPorcesing import DataProcessor
 
@@ -15,7 +18,7 @@ class DataProcessorYahoo(DataProcessor):
             ticker: inital ticker symbol (deprecated)
             ticker_file_path: path to file containing ticker symbols
         """
-        super().__init__(ticker,ticker_file_path)
+        super().__init__(ticker, ticker_file_path)
         self.ticker = ticker
         self.tickerFilePath = ticker_file_path
         self.tickerList = self.read_all_tickers_from_file()
@@ -31,39 +34,43 @@ class DataProcessorYahoo(DataProcessor):
         fetcher = DataFetcher(self.ticker)
         print(self.ticker)
 
-        days_to_go_back, ticker_first_updated, ticker_last_updated = fetcher.fetch_active_period()
-        days_to_go_back_total = days_to_go_back
-        days_to_go_back = days_to_go_back_total
+        minutes_to_go_back, ticker_first_updated, ticker_last_updated = fetcher.fetch_active_period()
+        minutes_to_go_back_total = minutes_to_go_back
+        # minutes_to_go_back = minutes_to_go_back_total
 
         local_time = market_checker.get_current_time()
         end_date = market_checker.convert_to_market_time(local_time)
 
         days_passed = 0
-
-        while days_to_go_back > 0:
+        minutes_in_day = 60 * 24
+        while minutes_to_go_back > 0:
+            print(minutes_to_go_back)
             if days_passed >= 60:
                 interval = '1d'
                 fetch_days = 30
+                subtract_minutes = 30 * minutes_in_day
                 days_pass_range = -1
             elif days_passed >= 30:
                 interval = '5m'
                 fetch_days = 7
+                subtract_minutes = 7 * minutes_in_day
                 days_pass_range = 60
             else:
                 interval = '1m'
                 fetch_days = 7
+                subtract_minutes = 7 * minutes_in_day
                 days_pass_range = 30
 
-            #last_runer = False
+            # last_runer = False
             if days_pass_range != -1:
                 remaining_days = days_pass_range - days_passed
                 remain_day_test = remaining_days % fetch_days
 
                 if days_pass_range < (days_passed + fetch_days + remain_day_test):
-                    #last_runer = True
+                    # last_runer = True
                     fetch_days = remain_day_test
 
-            start_date = end_date - timedelta(days=min(fetch_days, days_to_go_back))
+            start_date = end_date - timedelta(days=min(fetch_days, minutes_to_go_back))
 
             data = fetcher.fetch_data(start_date.strftime('%Y-%m-%d'), end_date.strftime('%Y-%m-%d'), interval)
 
@@ -71,8 +78,9 @@ class DataProcessorYahoo(DataProcessor):
                 self.all_data.append(data)
 
             end_date = start_date
-            days_to_go_back -= fetch_days
-            days_passed = (days_to_go_back_total - days_to_go_back)
+            minutes_to_go_back -= subtract_minutes
+            days_passed = math.ceil((minutes_to_go_back_total - minutes_to_go_back) / minutes_in_day)
+            print(days_passed)
 
         combined_data = pd.concat(self.all_data, ignore_index=True)
         return combined_data

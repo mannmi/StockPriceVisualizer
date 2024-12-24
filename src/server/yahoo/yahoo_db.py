@@ -1,6 +1,9 @@
 import argparse
 import logging
 import os
+
+from pandas import isna
+
 from src.logging.logging_config import logger, set_log_level
 import pandas as pd
 from src.server.DatabaseManager.DatabaseManager import DatabaseManager
@@ -36,15 +39,20 @@ class Yahoo(DatabaseManager):
         logger.info("Columns in DataFrame: %s", df.columns)
 
         # Ensure Datetime column is in datetime format
-        if ('Datetime', '') in df.columns:
+        if ('Datetime', '') in df.columns or ('Date', '') in df.columns:
             df[('Datetime', '')] = pd.to_datetime(df[('Datetime', '')], errors='coerce')
-            df = df.dropna(subset=[('Datetime', '')])  # Drop rows where conversion failed
+            #df = df.dropna(subset=[('Datetime', ''), ('Date', '')])
 
             # Determine the ticker symbol dynamically
             ticker_symbol = df.columns.get_level_values('Ticker')[1]
 
             for index, row in df.iterrows():
-                datetime_value = row[('Datetime', '')].strftime('%Y-%m-%d %H:%M:%S')
+                if not isna(row[('Datetime', '')]):
+                    datetime_value = row[('Datetime', '')].strftime('%Y-%m-%d %H:%M:%S')
+                else:
+                    #logger.info("got it :)")
+                    datetime_value = row[('Date', '')].strftime('%Y-%m-%d %H:%M:%S')
+                #if datetime_value != ticker_symbol:
                 open_value = row[('Open', ticker_symbol)]
                 high_value = row[('High', ticker_symbol)]
                 low_value = row[('Low', ticker_symbol)]
@@ -96,40 +104,7 @@ class Yahoo(DatabaseManager):
             except Exception as e:
                 logger.error(f"An error occurred for {ticker}: {e}")
 
-    # def fetch_and_store_data(self, tickers,api_key, fetch_recent=True ):
-    #     try:
-    #         watcher_list = self.get_ticker_list()
-    #     except Exception as e:
-    #         logger.error(f"An error occurred : {e}")
-    #         return
-    #
-    #     if tickers.empty:
-    #         raise ValueError("The list of tickers is empty. Please provide at least one ticker symbol.")
-    #
-    #     DataProcessorVar = DataProcessorYahoo(tickers, self.tickerFilePath)
-    #     for index, ticker in watcher_list.iterrows():
-    #         DataProcessorVar.ticker = ticker["symbol"]
-    #         timestamp=0
-    #         if(fetch_recent):
-    #             timestamp = self.get_max_timestamp(ticker["symbol"])
-    #             #exit()
-    #         if(timestamp is not None):
-    #             logger.info(f"Get Data in {ticker}")
-    #             data_store = DataProcessorVar.process_data()
-    #             if data_store is not None:
-    #                 logger.info(data_store.columns.tolist())
-    #                 self.store_data(ticker, data_store)
-
-    def fetch_and_store_data(self, tickers, api_key):
-        """
-        Fetch Data from Yahoo and store the data in the database for the given tickers/smybol
-        Args:
-            tickers: symbol that will have the stock data fetched from Yahoo and stored in the database
-            api_key: api key to fetch with (deprecated)
-
-        Returns:
-
-        """
+    def fetch_and_store_data(self, tickers,api_key, fetch_recent=True ):
         try:
             watcher_list = self.get_ticker_list()
         except Exception as e:
@@ -139,14 +114,47 @@ class Yahoo(DatabaseManager):
         if tickers.empty:
             raise ValueError("The list of tickers is empty. Please provide at least one ticker symbol.")
 
-        data_processor_var = DataProcessorYahoo(tickers, self.tickerFilePath)
+        DataProcessorVar = DataProcessorYahoo(tickers, self.tickerFilePath)
         for index, ticker in watcher_list.iterrows():
-            data_processor_var.ticker = ticker["symbol"]
-            data_store = data_processor_var.process_data()
-            clear()
-            # print(data_store.columns.tolist())
-            print(data_store)
-            self.store_data(ticker, data_store)
+            DataProcessorVar.ticker = ticker["symbol"]
+            timestamp=0
+            if(fetch_recent):
+                timestamp = self.get_max_timestamp(ticker["symbol"])
+                #exit()
+            if(timestamp is not None):
+                logger.info(f"Get Data in {ticker}")
+                data_store = DataProcessorVar.process_data()
+                if data_store is not None:
+                    logger.info(data_store.columns.tolist())
+                    self.store_data(ticker, data_store)
+
+    # def fetch_and_store_data(self, tickers, api_key):
+    #     """
+    #     Fetch Data from Yahoo and store the data in the database for the given tickers/smybol
+    #     Args:
+    #         tickers: symbol that will have the stock data fetched from Yahoo and stored in the database
+    #         api_key: api key to fetch with (deprecated)
+    #
+    #     Returns:
+    #
+    #     """
+    #     try:
+    #         watcher_list = self.get_ticker_list()
+    #     except Exception as e:
+    #         logger.error(f"An error occurred : {e}")
+    #         return
+    #
+    #     if tickers.empty:
+    #         raise ValueError("The list of tickers is empty. Please provide at least one ticker symbol.")
+    #
+    #     data_processor_var = DataProcessorYahoo(tickers, self.tickerFilePath)
+    #     for index, ticker in watcher_list.iterrows():
+    #         data_processor_var.ticker = ticker["symbol"]
+    #         data_store = data_processor_var.process_data()
+    #         clear()
+    #         # print(data_store.columns.tolist())
+    #         print(data_store)
+    #         self.store_data(ticker, data_store)
 
 
 # Example usage

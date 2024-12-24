@@ -75,8 +75,8 @@ Contributions are welcome! Please see the CONTRIBUTING.md, COMMIT_MESSAGE.md, an
 - [ ] There is currently no protection against race conditions (The watch list load has to be manually triggered).
 - [ ] TODO Split the Requirements.txt into separate files (This will make the installation of the ui Simpler as it does
   not need mysql handeler)
-- [ ] TODO fix the Historical Data storage, Bug with storing older Data. Data only store for the last x Month but more
-  data is fetched.
+- [x] TODO fix the Historical Data storage, Bug with storing older Data. Data only store for the last x Month but more
+  data is fetched. => Please do not check the Fix
 - [x] Add Doxygen Documentation. (Add issue if you find missing/faulty docstring)
 
 --- 
