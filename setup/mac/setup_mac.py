@@ -1,11 +1,17 @@
-# AI generated based on setup_linux.py
 import subprocess
 import os
 import time
 import venv
 
+#doxygen generate using ai
 
 def check_and_install_packages():
+    """
+    @brief Checks if specified packages are installed and installs them if not.
+
+    This function checks for the installation of specific packages using Homebrew
+    and installs them if they are not already installed.
+    """
     packages = ["python@3.12"]
 
     for package in packages:
@@ -18,8 +24,15 @@ def check_and_install_packages():
             print(f"{package} is not installed. Installing it now...")
             subprocess.run(["brew", "install", package], check=True)
 
-
 def create_venv(venv_dir):
+    """
+    @brief Creates a virtual environment.
+
+    This function creates a virtual environment at the specified directory path.
+    If the virtual environment already exists, it will not create a new one.
+
+    @param venv_dir The directory where the virtual environment will be created.
+    """
     print(f"Creating virtual environment at {venv_dir}")
 
     if not os.path.exists(venv_dir):
@@ -35,8 +48,15 @@ def create_venv(venv_dir):
     install_pip_if_missing(venv_dir)
     modify_activation_script(venv_dir)
 
-
 def install_pip_if_missing(venv_dir):
+    """
+    @brief Installs pip if it is missing in the virtual environment.
+
+    This function checks if pip is installed in the virtual environment, and if not,
+    installs it.
+
+    @param venv_dir The directory of the virtual environment.
+    """
     python_executable = os.path.join(venv_dir, 'bin', 'python')
     try:
         # Check if pip is installed
@@ -47,8 +67,15 @@ def install_pip_if_missing(venv_dir):
         subprocess.check_call([python_executable, '-m', 'ensurepip', '--upgrade'])
         subprocess.check_call([python_executable, '-m', 'pip', 'install', '--upgrade', 'pip'])
 
-
 def modify_activation_script(venv_dir):
+    """
+    @brief Modifies the activation script to include PYTHONPATH.
+
+    This function modifies the activation script of the virtual environment to
+    include the PYTHONPATH environment variable.
+
+    @param venv_dir The directory of the virtual environment.
+    """
     activate_script = os.path.join(venv_dir, 'bin', 'activate')
     if not os.path.exists(activate_script):
         print(f"Activation script not found: {activate_script}")
@@ -68,14 +95,26 @@ def modify_activation_script(venv_dir):
         f.write(f'\n{pythonpath_line}\n')
     print("Activation script modified to include PYTHONPATH.")
 
-
 def upgrade_pip(venv_dir):
+    """
+    @brief Upgrades pip to the latest version.
+
+    This function upgrades pip to the latest version in the virtual environment.
+
+    @param venv_dir The directory of the virtual environment.
+    """
     python_executable = os.path.join(venv_dir, 'bin', 'python')
     subprocess.check_call([python_executable, '-m', 'pip', 'install', '--upgrade', 'pip'])
     print("Upgraded pip")
 
-
 def install_mysqlclient(venv_dir):
+    """
+    @brief Installs the mysqlclient package.
+
+    This function installs the mysqlclient package in the virtual environment.
+
+    @param venv_dir The directory of the virtual environment.
+    """
     python_executable = os.path.join(venv_dir, 'bin', 'python')
     try:
         subprocess.check_call([python_executable, '-m', 'pip', 'install', 'mysqlclient'])
@@ -83,8 +122,15 @@ def install_mysqlclient(venv_dir):
     except subprocess.CalledProcessError as e:
         print(f"Error installing mysqlclient: {e}")
 
-
 def install_requirements(venv_dir):
+    """
+    @brief Installs packages from a requirements.txt file.
+
+    This function installs packages listed in a requirements.txt file in the virtual
+    environment.
+
+    @param venv_dir The directory of the virtual environment.
+    """
     python_executable = os.path.join(venv_dir, 'bin', 'python')
     if os.path.exists('requirements.txt'):
         for _ in range(3):  # Retry up to 3 times
@@ -100,8 +146,15 @@ def install_requirements(venv_dir):
     else:
         print("requirements.txt not found")
 
-
 def setup_mac(venv_dir):
+    """
+    @brief Sets up the environment on a macOS system.
+
+    This function sets up the environment on a macOS system by installing necessary
+    packages and creating a virtual environment.
+
+    @param venv_dir The directory of the virtual environment.
+    """
     print("Setting up on macOS")
     # Install MySQL client libraries
     subprocess.check_call(['brew', 'install', 'mysql-client'])

@@ -8,6 +8,19 @@ from src.os_calls.basic_os_calls import is_running_in_docker
 
 # Database Manager Class
 def validate_symbol_data(symbol):
+    """
+    Validates that the symbol meets the requirements.
+
+    Args:
+        symbol: The symbol to validate.
+
+    Returns:
+        symbol_data: The validated symbol data if the symbol is valid.
+
+    Raises:
+        Exception: If the symbol does not meet the requirements.
+    """
+
     # Ensure symbol is a Pandas Series
     if not isinstance(symbol, pd.Series):
         raise ValueError("symbol must be a Pandas Series")
@@ -33,18 +46,28 @@ def validate_symbol_data(symbol):
 
 class DatabaseManager:
     def __init__(self, docker_config, config):
+        """
+        Constructor of the DatabaseManager class.
+
+        Manages various data sources (e.g., API, brokerage, etc.)
+
+        Args:
+            docker_config (str): Path to the docker configuration file.
+            config (str): Path to the configuration file containing the API key.
+        """
+
         if docker_config is None:
             raise ValueError("No Path provided")
         elif config is None:
             raise ValueError("No Path provided")
 
-        #db_type = 'mysql+pymysql'
+        # db_type = 'mysql+pymysql'
         # variable declaration :)
         cpath = docker_config
         print(cpath)
         self.docker_config = YmlLoader(cpath)
         print(self.docker_config.data)
-        #self.docker_config = Yml_Loader(cpath)
+        # self.docker_config = Yml_Loader(cpath)
         if self.docker_config.data is None:
             raise ValueError("Config not loaded Properly")
         logger.info(self.docker_config.data)
@@ -64,10 +87,16 @@ class DatabaseManager:
         self.conn = None
         self.cursor = None
         self.setup_database()
-        self.engine = create_engine("mysql+pymysql://{user}:{pw}@{host}/{db}".format(host=self.host, db=self.database, user= self.user, pw=self.password))
+        self.engine = create_engine(
+            "mysql+pymysql://{user}:{pw}@{host}/{db}".format(host=self.host, db=self.database, user=self.user,
+                                                             pw=self.password))
         self.ticker_list_Storage = pd.DataFrame()
 
     def connect(self):
+        """
+        connect to the database
+        Returns: None
+        """
         if self.conn is None or not self.conn.is_connected():
             self.conn = mysql.connector.connect(
                 host=self.host,
@@ -79,6 +108,20 @@ class DatabaseManager:
             self.cursor = self.conn.cursor()
 
     def fetch_data_from_db(self, symbol_id):
+        """
+        Fetches data from the database for a given ticker.
+        Args:
+            symbol_id:
+
+        Returns:
+
+        """
+        if isinstance(symbol_id, pd.Series):
+            logger.info("The object is a pandas Series.")
+        elif isinstance(symbol_id, str):
+            logger.info("The object is a String.")
+            symbol_id = symbol_id["symbol"]
+
         logger.info("Fetching data from database {symbol_id}".format(symbol_id=symbol_id))
         self.connect()
         query = """
@@ -98,12 +141,22 @@ class DatabaseManager:
         return df
 
     def close(self):
+        """
+        closes the database connection
+        Returns:
+
+        """
         if self.cursor:
             self.cursor.close()
         if self.conn:
             self.conn.close()
 
     def setup_database(self):
+        """
+        setup the database Tables
+        Returns: None
+
+        """
         self.connect()
         self.cursor.execute('''
         CREATE TABLE IF NOT EXISTS symbols (
@@ -135,6 +188,15 @@ class DatabaseManager:
         logger.debug("Database setup complete.")
 
     def get_max_timestamp(self, symbol):
+        """
+        Get the max timestamp for a given ticker.
+        When was the ticker last updated?
+        Args:
+            symbol: the symbol to get the max timestamp for.
+
+        Returns:
+
+        """
         self.connect()
         try:
             self.cursor.execute('''SELECT MAX(timestamp) AS max_timestamp
@@ -158,7 +220,17 @@ class DatabaseManager:
         return result
 
     def get_ticker_list(self, watcher_only=True):
-        #result = []
+        """
+        get the ticker list from the database.
+        Args:
+            watcher_only:
+                @True Get only the tickers/symbol on the watch list
+                @False Get all the tickers/symbols in the database.
+
+        Returns: The ticker list.
+
+        """
+        # result = []
         self.connect()
         try:
             if watcher_only:
@@ -185,6 +257,14 @@ class DatabaseManager:
         return result
 
     def add_to_watcher_list(self, symbol):
+        """
+        Add the symbol to the watcher list.
+        Args:
+            symbol: symbol to add to the watcher list.
+
+        Returns:
+
+        """
         self.connect()
         try:
             self.cursor.execute('''
@@ -199,6 +279,14 @@ class DatabaseManager:
             self.close()
 
     def remove_from_watcher_list(self, symbol):
+        """
+        Remove the symbol from the watcher list.
+        Args:
+            symbol: symbol to remove from the watcher list.
+
+        Returns:
+
+        """
         logger.info("remove from watcher list")
         self.connect()
         try:
@@ -214,6 +302,15 @@ class DatabaseManager:
             self.close()
 
     def update_symbol(self, symbol):
+        """
+        Update the symbol with new data if not exists then create a new ticker.
+        (may have to be updated for when a ticker get unlisted and relisted with a new company)
+        Args:
+            symbol: symbol to update.
+
+        Returns:
+
+        """
         symbol_data = validate_symbol_data(symbol)
 
         try:
@@ -265,6 +362,14 @@ class DatabaseManager:
         return result
 
     def store_symbol(self, symbol):
+        """
+        store symbol in the database. Validate the symbol To check if valid.
+        Args:
+            symbol: symbol to be store in the database.
+
+        Returns: the symbol name 
+
+        """
         symbol_data = validate_symbol_data(symbol)
 
         try:

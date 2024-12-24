@@ -77,7 +77,7 @@ Contributions are welcome! Please see the CONTRIBUTING.md, COMMIT_MESSAGE.md, an
   not need mysql handeler)
 - [ ] TODO fix the Historical Data storage, Bug with storing older Data. Data only store for the last x Month but more
   data is fetched.
-- [ ] Add Doxygen Documentation.
+- [x] Add Doxygen Documentation. (Add issue if you find missing/faulty docstring)
 
 --- 
 

@@ -4,8 +4,11 @@
 import pytz
 from datetime import datetime
 
+
 class Markettimechecker:
+
     def __init__(self, local_tz='Asia/Seoul', market_tz='America/New_York'):
+
         self.local_tz = pytz.timezone(local_tz)
         self.market_tz = pytz.timezone(market_tz)
 
@@ -37,4 +40,3 @@ class Markettimechecker:
         market_close = now_market.replace(hour=16, minute=0, second=0, microsecond=0)
 
         return market_open <= now_market <= market_close
-

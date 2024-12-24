@@ -1,6 +1,9 @@
 from rest_framework import serializers
 
 class TickerSerializer(serializers.Serializer):
+    """
+    Serializer for Ticker model
+    """
     symbol = serializers.CharField(max_length=10)
     name = serializers.CharField(max_length=100, allow_null=True, required=False)
     exchange = serializers.CharField(max_length=10)

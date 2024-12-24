@@ -1,8 +1,6 @@
 import argparse
 import logging
 import os
-import sys
-#sys.path.append(os.path.join(os.path.dirname(__file__), '/app/'))
 from src.logging.logging_config import logger, set_log_level
 import pandas as pd
 from src.server.DatabaseManager.DatabaseManager import DatabaseManager
@@ -19,6 +17,15 @@ class Yahoo(DatabaseManager):
         self.tickerFilePath = ticker_file_path_arg
 
     def store_data(self, symbol, df):
+        """
+        Store data for the given symbol in the database
+        Args:
+            symbol: symbol the data is from
+            df: df containing the data
+
+        Returns:
+
+        """
         # Process the data using the DataProcessor class
 
         symbol_id = self.update_symbol(symbol)[0]
@@ -114,6 +121,15 @@ class Yahoo(DatabaseManager):
     #                 self.store_data(ticker, data_store)
 
     def fetch_and_store_data(self, tickers, api_key):
+        """
+        Fetch Data from Yahoo and store the data in the database for the given tickers/smybol
+        Args:
+            tickers: symbol that will have the stock data fetched from Yahoo and stored in the database
+            api_key: api key to fetch with (deprecated)
+
+        Returns:
+
+        """
         try:
             watcher_list = self.get_ticker_list()
         except Exception as e:
@@ -179,6 +195,5 @@ if __name__ == "__main__":
 
     print("Storing Data in Database")
     ticker_list = db_manager.get_ticker_list()
-    #db_manager.fetch_and_store_data(tickers_list, api_key_Load)
+    # db_manager.fetch_and_store_data(tickers_list, api_key_Load)
     #
-

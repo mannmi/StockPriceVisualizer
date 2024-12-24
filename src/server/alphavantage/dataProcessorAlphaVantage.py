@@ -11,6 +11,7 @@ class DataProcessorAlphaVantage:
 
     #todo update to support more granulair fetch (this has to be done later
     #   see how it was implemneted in fetchYahoo.py
+    #   not used at the moment. Class has to be fully rewriten :)
     def process_data(self,tickers):
         url = 'https://www.alphavantage.co/query'
         #configAuth = Yml_Loader('./config.yml')

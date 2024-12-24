@@ -6,73 +6,89 @@ import requests
 import pandas as pd
 from PyQt6.QtWidgets import (
     QApplication, QWidget, QVBoxLayout, QTextEdit, QTableWidget, QTableWidgetItem,
-    QComboBox, QPushButton, QHBoxLayout, QLineEdit, QMenuBar, QMenu, QProgressBar, QDialog
+    QComboBox, QPushButton, QHBoxLayout, QLineEdit, QMenuBar, QMenu
 )
-from PyQt6.QtCore import Qt, QThread, pyqtSignal
+from PyQt6.QtCore import Qt
 from qasync import QEventLoop, asyncSlot
 from src.logging.logging_config import logger
 import src.os_calls.basic_os_calls as os_calls
 from src.ui.PlotWindow import PlotWindow, has_redner_failed, open_in_browser
 
 
-class RenderThread(QThread):
-    update_progress = pyqtSignal(int)
-    render_complete = pyqtSignal(object)
+# todo implement a loading bar
+# class RenderThread(QThread):
+#
+#     update_progress = pyqtSignal(int)
+#     render_complete = pyqtSignal(object)
+#
+#     def __init__(self, filters, watcher=True, fetch_from_file=False):
+#         super().__init__()
+#         self.fetchFromFile = fetch_from_file
+#         # self.runner = runner
+#         self.filters = filters
+#         self.watcher = watcher
+#
+#     def run(self):
+#         if self.watcher:
+#             tickers_list = self.runner.get_tickers()
+#         else:
+#             if self.fetchFromFile:
+#                 tickers_list = self.runner.get_tickers(False)
+#             else:
+#                 tickers_list = self.runner.get_tickers_from_variable()
+#
+#         # Apply filters
+#         total_filters = len(self.filters)
+#         for i, (filter_column, filter_value) in enumerate(self.filters):
+#             if filter_value:
+#                 # Convert wildcard * to regex .*
+#                 filter_value = filter_value.replace('*', '.*')
+#                 tickers_list = tickers_list[
+#                     tickers_list[filter_column.lower()].str.contains(filter_value, case=False, regex=True)]
+#             progress = int(((i + 1) / total_filters) * 100)
+#             self.update_progress.emit(progress)  # Update progress bar
+#
+#         self.render_complete.emit(tickers_list)
 
-    def __init__(self, filters, watcher=True, fetch_from_file=False):
-        super().__init__()
-        self.fetchFromFile = fetch_from_file
-        # self.runner = runner
-        self.filters = filters
-        self.watcher = watcher
 
-    def run(self):
-        if self.watcher:
-            tickers_list = self.runner.get_tickers()
-        else:
-            if self.fetchFromFile:
-                tickers_list = self.runner.get_tickers(False)
-            else:
-                tickers_list = self.runner.get_tickers_from_variable()
-
-        # Apply filters
-        total_filters = len(self.filters)
-        for i, (filter_column, filter_value) in enumerate(self.filters):
-            if filter_value:
-                # Convert wildcard * to regex .*
-                filter_value = filter_value.replace('*', '.*')
-                tickers_list = tickers_list[
-                    tickers_list[filter_column.lower()].str.contains(filter_value, case=False, regex=True)]
-            progress = int(((i + 1) / total_filters) * 100)
-            self.update_progress.emit(progress)  # Update progress bar
-
-        self.render_complete.emit(tickers_list)
-
-
-class ProgressDialog(QDialog):
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        self.setWindowTitle("Loading")
-        self.setModal(True)
-        self.setGeometry(300, 300, 300, 100)
-
-        layout = QVBoxLayout()
-        self.progress_bar = QProgressBar(self)
-        layout.addWidget(self.progress_bar)
-        self.setLayout(layout)
-
-    def set_progress(self, value):
-        self.progress_bar.setValue(value)
+# class ProgressDialog(QDialog):
+#     def __init__(self, parent=None):
+#         super().__init__(parent)
+#         self.setWindowTitle("Loading")
+#         self.setModal(True)
+#         self.setGeometry(300, 300, 300, 100)
+#
+#         layout = QVBoxLayout()
+#         self.progress_bar = QProgressBar(self)
+#         layout.addWidget(self.progress_bar)
+#         self.setLayout(layout)
+#
+#     def set_progress(self, value):
+#         self.progress_bar.setValue(value)
 
 
 def create_read_only_item(text):
+    """
+    Marks The object as read-only.
+    Text field are no longer modifiable by user.
+    Args:
+        text: Text that is supposed to be read-only.
+
+    Returns: Return the text as a QTableWidgetItem
+
+    """
     item = QTableWidgetItem(text)
     item.setFlags(Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsEnabled)
     return item
 
 
-def debug_html(fig_html):
-    # Write the HTML to a file for debugging
+def store_html(fig_html):
+    """
+    @brief store html for debugging purpose
+    Args:
+        fig_html: the html to be stored
+
+    """
     try:
         with open("./tmp_html/fig_debug.html", "w", encoding="utf-8") as file:
             file.write(fig_html)
@@ -82,6 +98,9 @@ def debug_html(fig_html):
 
 class AppDemo(QWidget):
     def __init__(self):
+        """
+        Constructor of AppDemo
+        """
         super().__init__()
         self.setWindowTitle('Yahoo Async Runner')
         self.setGeometry(100, 100, 600, 400)
@@ -147,6 +166,11 @@ class AppDemo(QWidget):
         self.setLayout(layout)
 
     def add_filter_row(self):
+        """
+        @brief add filter row
+        Returns:
+
+        """
         filter_row = QHBoxLayout()
         filter_input = QLineEdit(self)
         filter_row.addWidget(filter_input)
@@ -159,6 +183,11 @@ class AppDemo(QWidget):
 
     @asyncSlot()
     async def apply_filter(self):
+        """
+        @brief apply filter to the data
+        Returns: None
+
+        """
         filters = self.get_filters()
         loop = asyncio.get_event_loop()
         response = await loop.run_in_executor(None, requests.post, 'http://127.0.0.1:8000/api/apply_filters/',
@@ -182,10 +211,25 @@ class AppDemo(QWidget):
         self.populate_table(tickers_list)
 
     def toggle_table_visibility(self, visible):
+        """
+        @brief Toggles the visibility of the table.
+
+        Args:
+            visible (bool):
+                - True: Sets the table as visible.
+                - False: Sets the table as not visible.
+
+        Returns: None
+        """
         self.table.setVisible(visible)
         logger.info(f"Table visibility set to {visible}")
 
     def add_filter_row(self):
+        """
+        @brief Add a filter to the table.
+        Returns: None
+
+        """
         filter_row = QHBoxLayout()
 
         filter_dropdown = QComboBox(self)
@@ -203,6 +247,14 @@ class AppDemo(QWidget):
         self.filter_layout.addLayout(filter_row)
 
     def remove_filter_row(self, filter_row):
+        """
+        @brief Remove a filter from the table.
+        Args:
+            filter_row: the filter row to remove.
+
+        Returns: None
+
+        """
         for i in reversed(range(filter_row.count())):
             widget = filter_row.itemAt(i).widget()
             if widget is not None:
@@ -210,6 +262,11 @@ class AppDemo(QWidget):
         self.filter_layout.removeItem(filter_row)
 
     def get_filters(self):
+        """
+        @brief Get all the filters in the table.
+        Returns: the filters list
+
+        """
         filters = []
         for i in range(self.filter_layout.count()):
             filter_row = self.filter_layout.itemAt(i).layout()
@@ -220,6 +277,12 @@ class AppDemo(QWidget):
 
     @asyncSlot()
     async def get_watched_list(self):
+        """
+        @brief Get all the tickers that are on the watched lists. And populate the table with the tickers
+
+        Returns: None
+
+        """
         loop = asyncio.get_event_loop()
         response = await loop.run_in_executor(None, requests.get, 'http://127.0.0.1:8000/api/get_watched_list_all/')
         try:
@@ -237,6 +300,12 @@ class AppDemo(QWidget):
 
     @asyncSlot()
     async def get_all_tickers_file(self):
+        """
+        @brief Get all the tickers From the File. And populate the table with the tickers.
+
+        Returns: None
+
+        """
         loop = asyncio.get_event_loop()
         response = await loop.run_in_executor(None, requests.get, 'http://127.0.0.1:8000/api/get_all_tickers_file/')
         try:
@@ -254,6 +323,12 @@ class AppDemo(QWidget):
 
     @asyncSlot()
     async def get_all_tickers_db(self):
+        """
+        Get all the tickers From the DB. And populate the table with the tickers.
+
+        Returns: None
+
+        """
         loop = asyncio.get_event_loop()
         response = await loop.run_in_executor(None, requests.get,
                                               'http://127.0.0.1:8000/api/get_tickers_from_variable/')
@@ -272,6 +347,12 @@ class AppDemo(QWidget):
 
     @asyncSlot()
     async def get_all_tickers_variable(self):
+        """
+        Get all the tickers From the Variable. And populate the table with the tickers.
+
+        Returns: None
+
+        """
         loop = asyncio.get_event_loop()
         response = await loop.run_in_executor(None, requests.get,
                                               'http://127.0.0.1:8000/api/get_tickers_from_variable/')
@@ -289,6 +370,17 @@ class AppDemo(QWidget):
         self.populate_table(tickers_list)
 
     def populate_table(self, tickers_list):
+        """
+        @brief Populate the table with the tickers.
+        Args:
+
+            tickers_list (Pandas Series): List of tickers To populate table with Format
+                (Pandas Series) See docs/ticker_list to see an example.
+
+
+        Returns: None
+
+        """
         self.output.append(f"Watched List: {tickers_list}")
         self.table.setRowCount(len(tickers_list))
 
@@ -318,6 +410,15 @@ class AppDemo(QWidget):
 
     @asyncSlot()
     async def update_watching_status(self, row, index):
+        """
+        @brief Tell the server to update watch status in the database.
+        Args:
+            row: the ticker that is affected by the update.
+            index: 1 add to watch list any other value remove from watch list.
+
+        Returns: None
+
+        """
         loop = asyncio.get_event_loop()
         if index == 1:
             await loop.run_in_executor(None, requests.post, 'http://127.0.0.1:8000/api/add_to_watch_list/',
@@ -333,6 +434,11 @@ class AppDemo(QWidget):
 
     @asyncSlot()
     async def update_watch_list(self):
+        """
+        @brief Tell the server to update watch list in the database.
+        Returns: None
+
+        """
         loop = asyncio.get_event_loop()
         await loop.run_in_executor(None, requests.post, 'http://127.0.0.1:8000/api/update_watch_list/',
                                    {'tickers': "A"})
@@ -340,12 +446,21 @@ class AppDemo(QWidget):
 
     @asyncSlot()
     async def update_ticker_list(self):
+        """
+        @brief Tell the server to update ticker list in the file
+        Returns: None
+
+        """
         loop = asyncio.get_event_loop()
         await loop.run_in_executor(None, requests.post, 'http://127.0.0.1:8000/api/update_ticker_list/')
         self.output.append("Ticker list updated.")
 
     @asyncSlot()
     async def store_ticker_list(self):
+        """
+        @brief Tell the server to store ticker list (file) in the database.
+        Returns:
+        """
         loop = asyncio.get_event_loop()
         await loop.run_in_executor(None, requests.post, 'http://127.0.0.1:8000/api/store_ticker_list/',
                                    {'tickers': "A"})
@@ -353,6 +468,21 @@ class AppDemo(QWidget):
 
     # todo rewrtite all functions to use a api_call handler instead
     async def api_call(self, endpoint, payload, expect_html=False):
+        """
+        Handles API calls.
+
+        Args:
+            endpoint (str): Defines which endpoint to be called.
+            payload (dict): Defines the payload to be sent.
+            expect_html (bool): Indicates if the return value is expected to be HTML.
+
+        Returns:
+            Response: A valid response object if successful.
+            None: If the API call fails.
+
+        The return type can be either a Series or HTML, depending on the requested format.
+        The format is determined by the API endpoint called.
+        """
         url = f'http://127.0.0.1:8000/{endpoint}'
 
         loop = asyncio.get_event_loop()
@@ -373,6 +503,15 @@ class AppDemo(QWidget):
 
     @asyncSlot()
     async def visualize_row(self, row):
+        """
+        Instructs the server to send and plot the data in an HTML visualization.
+
+        Args:
+            row (Series): The row of data to be plotted.
+
+        Returns:
+            None
+        """
         logger.info("Visualization Started")
 
         # Convert Series to dictionary and serialize using TickerSerializer
@@ -405,7 +544,7 @@ class AppDemo(QWidget):
         fig_html = html.unescape(fig_html_response.text)
 
         # Debug HTML content (optional)
-        debug_html(fig_html)
+        store_html(fig_html)
 
         # Check if Qt rendering has previously failed
         if has_redner_failed():
@@ -424,10 +563,6 @@ class AppDemo(QWidget):
         if not has_redner_failed():
             if not QApplication.instance():
                 app.exec()
-
-
-async def run_visualize(self, row):
-    await self.visualize_row(row)
 
 
 def main():

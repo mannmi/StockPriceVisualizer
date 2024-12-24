@@ -23,9 +23,25 @@ render_failed = False
 
 
 def has_redner_failed():
+    """
+    checks if the redner has failed. (global variable check)
+    Returns:
+        True if the redner has failed. (global variable check)
+        False if the redner has not failed. (global variable check)
+
+    """
     return render_failed
 
 def cleanup_old_files(directory, days):
+    """
+    cleanup old files by deleting older files if a certain number of days old.
+    Args:
+        directory: what directory to cleanup
+        days: how many days to wait for deletion
+
+    Returns: None
+
+    """
     now = datetime.now()
     cutoff = now - timedelta(days=days)
 
@@ -39,6 +55,15 @@ def cleanup_old_files(directory, days):
 
 
 def open_in_browser(html_content, symbol):
+    """
+    open the html content in a browser.
+    Args:
+        html_content: the html content to be opened
+        symbol: the symbol for which the html content is to be opened
+
+    Returns:
+
+    """
     # Generate a random string for the HTML file name
     if symbol:
         plot_string = symbol
@@ -60,6 +85,13 @@ def open_in_browser(html_content, symbol):
 
 class PlotWindow(QMainWindow):
     def __init__(self, fig_html, symbol=None, parent=None):
+        """
+        PlotWindow for handeling Plot window
+        Args:
+            fig_html: the figure html content to be opened
+            symbol: the symbol for which the html content is to be opened
+            parent: the ui parent widget (not yet used)
+        """
         super().__init__(parent)
         self.fig_html = fig_html
         self.web_view = QWebEngineView()
@@ -80,6 +112,14 @@ class PlotWindow(QMainWindow):
             open_in_browser(self.fig_html, self.symbol)
 
     def check_rendering(self, success):
+        """
+        Checks if the html content is rendering correctly and If not open browser window
+        Args:
+            success: the flag containing if it was a success
+
+        Returns:
+
+        """
         if not success:
             QMessageBox.warning(self, "Rendering Issue",
                                 "Sadly, there's an issue with Qt, so we have to open the browser for now.")
@@ -88,6 +128,14 @@ class PlotWindow(QMainWindow):
             render_failed = True
 
     def closeEvent(self, event):
+        """
+        Handle close event
+        Args:
+            event: 
+
+        Returns:
+
+        """
         event.accept()
 
 

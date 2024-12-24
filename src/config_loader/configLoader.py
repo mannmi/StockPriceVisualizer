@@ -15,6 +15,12 @@ import os
 import yaml
 
 
+
+
+def detect_doblicates(tmpdata):
+    duplicates = [key for key, value in collections.Counter(tmpdata.values()).items() if value > 1]
+    print(duplicates)
+
 ## @class Yml_Loader
 #  @brief This class is used to load and modify a YAML configuration file.
 #
@@ -38,11 +44,6 @@ import yaml
 # project_root = loader.find_project_root()
 #
 # @endcode
-
-def detect_doblicates(tmpdata):
-    duplicates = [key for key, value in collections.Counter(tmpdata.values()).items() if value > 1]
-    print(duplicates)
-
 
 class YmlLoader:
     ## @brief The constructor for the Yml_Loader class.
@@ -97,3 +98,4 @@ class YmlLoader:
 
         # Return the directory that contains setup.py
         return path
+
