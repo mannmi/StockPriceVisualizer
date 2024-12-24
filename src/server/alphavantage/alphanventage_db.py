@@ -11,6 +11,14 @@ logger.info("MySQL Connector is installed and working!")
 
 
 def fetch_all_tickers(api_key):
+    """
+    fetch all tickers from AlphaVantage
+    Args:
+        api_key: api key from AlphaVantage to fetch all tickers with
+
+    Returns:
+
+    """
     url = 'https://www.alphavantage.co/query'
     params = {
         'function': 'LISTING_STATUS',
@@ -30,29 +38,53 @@ def fetch_all_tickers(api_key):
 
 class AlphaEvent(DatabaseManager):
     def __init__(self, docker_config, api_key):
+        """
+        Constructor for AlphaVantage
+        Args:
+            docker_config: the path to the docker config file
+            api_key: the path to the api key file
+        """
         super().__init__(docker_config, api_key)
 
-    def store_data(self, symbol, df):
-        symbol_id = self.update_symbol(symbol)
+    def store_data(self, ticker, df):
+        """
+        Store Ticker associated Data in DB
+        Args:
+            ticker: the ticker whose data will be stored
+            df: the dataframe containing the stock data
+
+        Returns: None
+
+        """
+        ticker_id = self.update_symbol(ticker)
         # store prices in database
         for index, row in df.iterrows():
             self.cursor.execute('''
             SELECT COUNT(*) FROM prices WHERE symbol_id = %s AND timestamp = %s
-            ''', (symbol_id, index))
+            ''', (ticker_id, index))
             count = self.cursor.fetchone()[0]
             if count == 0:
                 self.cursor.execute('''
                 INSERT INTO prices (symbol_id, timestamp, open, high, low, close, volume)
                 VALUES (%s, %s, %s, %s, %s, %s, %s)
                 ''', (
-                symbol_id, index, row['1. open'], row['2. high'], row['3. low'], row['4. close'], row['5. volume']))
+                ticker_id, index, row['1. open'], row['2. high'], row['3. low'], row['4. close'], row['5. volume']))
         self.conn.commit()
         self.close()
-        logger.info(f"Data for {symbol} has been stored in the database.")
+        logger.info(f"Data for {ticker} has been stored in the database.")
 
 
     # Fetch and store data for multiple tickers
     def fetch_and_store_data(self, tickers, api_key):
+        """
+        Fetch and store all data from AlphaVantage in database
+        Args:
+            tickers: list of tickers
+            api_key: the api key
+
+        Returns:
+
+        """
         url = 'https://www.alphavantage.co/query'
         # configAuth = Yml_Loader('./config.yml')
 

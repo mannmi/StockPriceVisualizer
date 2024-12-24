@@ -1,7 +1,18 @@
 import logging
 import os
 
+from src.config_loader.configLoader import YmlLoader
+
+
 def set_log_level(level):
+    """
+    Sets the log level for logger (logging)
+    Args:
+        level: the log level
+
+    Returns:
+
+    """
     logger.setLevel(level)
     for handler in logger.handlers:
         handler.setLevel(level)
@@ -13,3 +24,5 @@ else:
     logger = logging.getLogger(__name__)
 
 logger.info('This is a test log message')
+
+YmlLoader = YmlLoader("test.yml")

@@ -20,7 +20,10 @@ def clear():
 
 
 def find_project_root():
-    # Start at the current directory
+    """
+    find the root of the project curently using the .gitignore file to determine the root directory
+    returns: the root of the project
+    """
     path = os.getcwd()
 
     # Keep going up until we find the main.py file
@@ -35,6 +38,11 @@ def find_project_root():
 
 
 def get_root_path():
+    """
+    get the root of the project (for docker&venv)
+    Returns: the root of the project
+
+    """
     if is_running_in_docker():
         cpath_root = os.path.abspath("/app/")
     else:

@@ -1,4 +1,3 @@
-import matplotlib.pyplot as plt
 from datetime import timedelta
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
@@ -8,30 +7,14 @@ from src.server.yahoo.fetchYahoo import DataFetcher
 from src.server.DatabaseManager.dataPorcesing import DataProcessor
 
 
-def zoom(event):
-    ax = plt.gca()
-    xlim = ax.get_xlim()
-    ylim = ax.get_ylim()
-
-    zoom_factor = 1.2 if event.step > 0 else 1 / 1.2
-
-    new_xlim = [(x - (x - xlim[0]) * zoom_factor) for x in xlim]
-    new_ylim = [(y - (y - ylim[0]) * zoom_factor) for y in ylim]
-
-    ax.set_xlim(new_xlim)
-    ax.set_ylim(new_ylim)
-    plt.draw()
-
-
-def onselect(eclick, erelease):
-    ax = plt.gca()
-    ax.set_xlim(eclick.xdata, erelease.xdata)
-    ax.set_ylim(eclick.ydata, erelease.ydata)
-    plt.draw()
-
-
 class DataProcessorYahoo(DataProcessor):
     def __init__(self, ticker, ticker_file_path):
+        """
+        data processor for Yahoo data Deals with Data Processing
+        Args:
+            ticker: inital ticker symbol (deprecated)
+            ticker_file_path: path to file containing ticker symbols
+        """
         super().__init__(ticker,ticker_file_path)
         self.ticker = ticker
         self.tickerFilePath = ticker_file_path
@@ -39,6 +22,11 @@ class DataProcessorYahoo(DataProcessor):
         self.all_data = []
 
     def process_data(self):
+        """
+        fetch data from Yahoo API (todo rewrite to take ticker as argument ?)
+        Returns: Data for the ticker
+
+        """
         market_checker = Markettimechecker()
         fetcher = DataFetcher(self.ticker)
         print(self.ticker)
@@ -96,6 +84,23 @@ class DataProcessorYahoo(DataProcessor):
     # fig_html = plot_data(data, period='all')  # Plot all available data
 
     def plot_data(self, data, period='all'):
+        """
+
+        Args:
+            data: data to plot
+            period: period to plot
+
+        Returns:
+            html of the data
+
+        Example:
+            @code
+             fig_html = plot_data(data, period='1Y')  # Plot data for the last 1 year
+             fig_html = plot_data(data, period='2Y')  # Plot data for the last 2 years
+             fig_html = plot_data(data, period='all')  # Plot all available data
+            @endcode
+
+        """
         if data.empty:
             print("It's empty")
             return None

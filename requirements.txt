@@ -7,7 +7,6 @@ webview-android
 kivy_garden
 pywebview
 python-telegram-bot
-#config.yml (remove later)
 opencv-python
 pytesseract
 mysql
@@ -34,7 +33,7 @@ django-documentation
 pytz
 setuptools
 django-serializers
-
+venv
 
 
 

@@ -3,6 +3,14 @@ from django.shortcuts import render
 from django.http import HttpResponse
 
 def api_documentation_view(request):
+    """
+    provide a web view for the API documentation
+    Args:
+        request: django Request object
+
+    Returns: html Render
+
+    """
     with open('../docs/API_DOCUMENTATION.md', 'r') as file:
         content = file.read()
         html_content = markdown.markdown(content, extensions=['fenced_code'])
@@ -10,6 +18,14 @@ def api_documentation_view(request):
 
 
 def raw_markdown_view(request):
+    """
+    provide a raw markdown view of the API documentation
+    Args:
+        request: django Request object
+
+    Returns: html Render
+
+    """
     with open('../docs/API_DOCUMENTATION.md', 'r') as file:
         content = file.read()
     return HttpResponse(content, content_type='text/plain')
