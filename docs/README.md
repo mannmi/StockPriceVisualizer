@@ -69,8 +69,8 @@ Contributions are welcome! Please see the CONTRIBUTING.md, COMMIT_MESSAGE.md, an
 
 - [ ] Fix database scraper (there still seems to be an issue with the function `fetch_active_period`). For now, it is
   commented out, but fixing it would improve performance when updating the database.
-- [ ] Switch the graph rendering for the table; it's kind of bad. (Qt web seems to be broken on my system, so I can't
-  test it. It now opens a browser tab instead.)
+- [x] Switch the graph rendering for the table; it's kind of bad. (Qt web seems to be broken on my system, so I can't
+  test it. It now opens a browser tab instead.). Fixed all credits go to => [link](https://stackoverflow.com/questions/39184615/qwebengineview-cannot-load-large-svg-html-using-sethtml)
 - [ ] Fix filter rules
 - [ ] There is currently no protection against race conditions (The watch list load has to be manually triggered).
 - [ ] TODO Split the Requirements.txt into separate files (This will make the installation of the ui Simpler as it does

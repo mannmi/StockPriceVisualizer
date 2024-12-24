@@ -3,13 +3,18 @@ import sys
 import webbrowser
 import uuid
 from datetime import datetime, timedelta
-from PyQt6.QtWebEngineCore import QWebEngineSettings
+from PyQt6.QtCore import QUrl, QByteArray, QBuffer, QIODevice
 from PyQt6.QtWidgets import QMessageBox, QMainWindow, QVBoxLayout, QWidget, QApplication
+from PyQt6.QtWebEngineCore import QWebEngineSettings, QWebEngineUrlScheme, QWebEngineUrlSchemeHandler, \
+    QWebEngineUrlRequestJob
 from PyQt6.QtWebEngineWidgets import QWebEngineView
 import ipywidgets as widgets
 from src.logging.logging_config import logger
 
 logger.info(widgets.__version__)
+
+# Credit for the qt render workaround goes to the original author from Stack Overflow:
+# https://stackoverflow.com/questions/39184615/qwebengineview-cannot-load-large-svg-html-using-sethtml
 
 # Determine the path of the tmp_html directory
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -18,29 +23,64 @@ tmp_html_dir = os.path.join(current_dir, 'tmp_html')
 # Create the tmp_html directory if it does not exist
 os.makedirs(tmp_html_dir, exist_ok=True)
 
-# variable to track if Qt rendering has failed
+# Variable to track if Qt rendering has failed
 render_failed = False
 
+HTML_DATA = {}
+URL_SCHEME = 'local'
+TEST_FILE = 'test.data'
 
-def has_redner_failed():
+
+class UrlSchemeHandler(QWebEngineUrlSchemeHandler):
+    def requestStarted(self, job):
+        href = job.requestUrl().path()
+        if (data := HTML_DATA.get(href)) is not None:
+            if not isinstance(data, bytes):
+                data = str(data).encode()
+            mime = QByteArray(b'text/html')
+            buffer = QBuffer(job)
+            buffer.setData(data)
+            buffer.open(QIODevice.OpenModeFlag.ReadOnly)
+            job.reply(mime, buffer)
+        else:
+            print(f'ERROR: request job failed: {href!r}')
+            job.fail(QWebEngineUrlRequestJob.Error.UrlNotFound)
+
+
+def register_url_scheme():
     """
-    checks if the redner has failed. (global variable check)
-    Returns:
-        True if the redner has failed. (global variable check)
-        False if the redner has not failed. (global variable check)
+    Register the URL scheme handler for the custom local scheme.
 
+    Returns:
+        None
+    """
+    scheme = QWebEngineUrlScheme(bytes(URL_SCHEME, 'ascii'))
+    scheme.setFlags(QWebEngineUrlScheme.Flag.SecureScheme |
+                    QWebEngineUrlScheme.Flag.LocalScheme |
+                    QWebEngineUrlScheme.Flag.LocalAccessAllowed)
+    QWebEngineUrlScheme.registerScheme(scheme)
+
+
+def has_render_failed():
+    """
+    Checks if the render has failed (global variable check).
+
+    Returns:
+        bool: True if the render has failed, False otherwise.
     """
     return render_failed
 
+
 def cleanup_old_files(directory, days):
     """
-    cleanup old files by deleting older files if a certain number of days old.
+    Cleanup old files by deleting older files if a certain number of days old.
+
     Args:
-        directory: what directory to cleanup
-        days: how many days to wait for deletion
+        directory (str): The directory to cleanup.
+        days (int): The number of days to wait for deletion.
 
-    Returns: None
-
+    Returns:
+        None
     """
     now = datetime.now()
     cutoff = now - timedelta(days=days)
@@ -56,13 +96,14 @@ def cleanup_old_files(directory, days):
 
 def open_in_browser(html_content, symbol):
     """
-    open the html content in a browser.
+    Open the HTML content in a browser.
+
     Args:
-        html_content: the html content to be opened
-        symbol: the symbol for which the html content is to be opened
+        html_content (str): The HTML content to be opened.
+        symbol (str): The symbol for which the HTML content is to be opened.
 
     Returns:
-
+        None
     """
     # Generate a random string for the HTML file name
     if symbol:
@@ -86,55 +127,76 @@ def open_in_browser(html_content, symbol):
 class PlotWindow(QMainWindow):
     def __init__(self, fig_html, symbol=None, parent=None):
         """
-        PlotWindow for handeling Plot window
+        PlotWindow for handling Plot window.
+
         Args:
-            fig_html: the figure html content to be opened
-            symbol: the symbol for which the html content is to be opened
-            parent: the ui parent widget (not yet used)
+            fig_html (str): The figure HTML content to be opened.
+            symbol (str, optional): The symbol for which the HTML content is to be opened. Defaults to None.
+            parent (QWidget, optional): The UI parent widget (not yet used). Defaults to None.
         """
         super().__init__(parent)
         self.fig_html = fig_html
-        self.web_view = QWebEngineView()
-        self.web_view.settings().setAttribute(QWebEngineSettings.WebAttribute.JavascriptEnabled, True)
         self.symbol = symbol
 
+        # Register the URL scheme handler
+        register_url_scheme()
+
+        self.web_view = QWebEngineView()
+
+        # Enable JavaScript
+        self.web_view.settings().setAttribute(QWebEngineSettings.WebAttribute.JavascriptEnabled, True)
+        self.web_view.settings().setAttribute(QWebEngineSettings.WebAttribute.PluginsEnabled, True)
+
+        # Register the URL scheme handler
+        self.web_view.page().profile().installUrlSchemeHandler(
+            bytes(URL_SCHEME, 'ascii'), UrlSchemeHandler(self))
+
         # Attempt to render using Qt if render has not failed before
-        if not render_failed:
-            self.setWindowTitle('Plot Window')
-            self.setGeometry(100, 100, 800, 600)
-            self.central_widget = QWidget()
-            self.setCentralWidget(self.central_widget)
-            self.layout = QVBoxLayout(self.central_widget)
-            self.web_view.setHtml(self.fig_html)
-            self.web_view.loadFinished.connect(self.check_rendering)
-            self.layout.addWidget(self.web_view)
-        else:
-            open_in_browser(self.fig_html, self.symbol)
+        self.setWindowTitle('Plot Window')
+        self.setGeometry(100, 100, 800, 600)
+        self.central_widget = QWidget()
+        self.setCentralWidget(self.central_widget)
+        self.layout = QVBoxLayout(self.central_widget)
+
+        # Check if the symbol is provided and prepare HTML content
+        HTML_DATA[TEST_FILE] = self.fig_html
+
+        url = QUrl(TEST_FILE)
+        url.setScheme(URL_SCHEME)
+        self.web_view.setUrl(url)
+
+        self.web_view.loadFinished.connect(self.check_rendering)
+        self.layout.addWidget(self.web_view)
 
     def check_rendering(self, success):
         """
-        Checks if the html content is rendering correctly and If not open browser window
+        Checks if the HTML content is rendering correctly and, if not, opens a browser window.
+
         Args:
-            success: the flag containing if it was a success
+            success (bool): The flag indicating if rendering was successful.
 
         Returns:
-
+            None
         """
+        global render_failed
         if not success:
+            logger.error("Qt rendering failed. Falling back to browser.")
             QMessageBox.warning(self, "Rendering Issue",
                                 "Sadly, there's an issue with Qt, so we have to open the browser for now.")
             open_in_browser(self.fig_html, self.symbol)
-            global render_failed
             render_failed = True
+        else:
+            logger.info("Qt rendering succeeded.")
 
     def closeEvent(self, event):
         """
-        Handle close event
+        Handle close event.
+
         Args:
-            event: 
+            event (QCloseEvent): The close event.
 
         Returns:
-
+            None
         """
         event.accept()
 
@@ -157,3 +219,5 @@ if __name__ == "__main__":
     window.show()
 
     sys.exit(app.exec())
+
+
