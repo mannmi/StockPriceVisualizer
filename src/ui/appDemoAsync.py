@@ -1,5 +1,6 @@
 import html
 import json
+import os
 import sys
 import asyncio
 import requests
@@ -9,10 +10,11 @@ from PyQt6.QtWidgets import (
     QComboBox, QPushButton, QHBoxLayout, QLineEdit, QMenuBar, QMenu
 )
 from PyQt6.QtCore import Qt
-from qasync import QEventLoop, asyncSlot
+from qasync import QEventLoop, asyncSlot, QtGui
 from src.logging.logging_config import logger
 import src.os_calls.basic_os_calls as os_calls
-from src.ui.PlotWindow import PlotWindow, has_redner_failed, open_in_browser
+from src.os_calls.basic_os_calls import get_root_path
+from src.ui.PlotWindow import PlotWindow, has_render_failed, open_in_browser
 
 
 # todo implement a loading bar
@@ -164,6 +166,8 @@ class AppDemo(QWidget):
 
         layout.setMenuBar(menu_bar)
         self.setLayout(layout)
+
+
 
     def add_filter_row(self):
         """
@@ -547,7 +551,7 @@ class AppDemo(QWidget):
         store_html(fig_html)
 
         # Check if Qt rendering has previously failed
-        if has_redner_failed():
+        if has_render_failed():
             open_in_browser(fig_html, row["symbol"])
             return
 
@@ -560,7 +564,7 @@ class AppDemo(QWidget):
         plot_window.show()
         self.plot_windows.append(plot_window)  # Keep a reference
 
-        if not has_redner_failed():
+        if not has_render_failed():
             if not QApplication.instance():
                 app.exec()
 
