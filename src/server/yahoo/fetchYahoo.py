@@ -54,7 +54,6 @@ class DataFetcher:
 
         # If a start_date is provided, convert it to a datetime object
         if start_date is not None:
-            start_date = datetime.strptime(start_date, '%Y-%m-%d %H:%M:%S')
 
             # Convert the index of data to timezone-naive if necessary
             data.index = data.index.tz_localize(None)

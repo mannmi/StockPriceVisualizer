@@ -31,6 +31,7 @@ services:
       - ./ui/:/app/ui/
       - ./src:/app/src/
       - ./docker-compose.yml:/app/docker-compose.yml
+      - ./tmp_data:/app/tmp_data/
     ports:
       - "8000:8000"
     depends_on:
@@ -55,7 +56,8 @@ services:
       - '3306:3306'
     volumes:
       - my-db:/var/lib/mysql
-      - ./data/mysql:/docker-entrypoint-initdb.d
+      # Add new users to db (? feature for spliting the user for django and data ?)
+      #- ./data/mysql:/docker-entrypoint-initdb.d
     healthcheck:
       test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
       interval: 1m

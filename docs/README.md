@@ -67,8 +67,8 @@ Contributions are welcome! Please see the CONTRIBUTING.md, COMMIT_MESSAGE.md, an
 
 ## TODO List
 
-- [ ] Fix database scraper (there still seems to be an issue with the function `fetch_active_period`). For now, it is
-  commented out, but fixing it would improve performance when updating the database.
+- [x] Fix database scraper (there still seems to be an issue with the function `fetch_active_period`). For now, it is
+  commented out, but fixing it would improve performance when updating the database. The improvement only works on second fetch :) 
 - [x] Switch the graph rendering for the table; it's kind of bad. (Qt web seems to be broken on my system, so I can't
   test it. It now opens a browser tab instead.). Fixed all credits go to => [link](https://stackoverflow.com/questions/39184615/qwebengineview-cannot-load-large-svg-html-using-sethtml)
 - [ ] Fix filter rules
@@ -78,6 +78,9 @@ Contributions are welcome! Please see the CONTRIBUTING.md, COMMIT_MESSAGE.md, an
 - [x] TODO fix the Historical Data storage, Bug with storing older Data. Data only store for the last x Month but more
   data is fetched. => Please do not check the Fix
 - [x] Add Doxygen Documentation. (Add issue if you find missing/faulty docstring)
+
+## Work on in Future patch
+- [ ] add Multi threading 
 
 --- 
 
