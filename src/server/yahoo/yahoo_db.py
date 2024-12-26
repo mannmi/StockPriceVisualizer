@@ -123,7 +123,7 @@ class Yahoo(DatabaseManager):
                 #exit()
             if(timestamp is not None):
                 logger.info(f"Get Data in {ticker}")
-                data_store = DataProcessorVar.process_data()
+                data_store = DataProcessorVar.process_data(timestamp)
                 if data_store is not None:
                     logger.info(data_store.columns.tolist())
                     self.store_data(ticker, data_store)

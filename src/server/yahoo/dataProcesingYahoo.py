@@ -24,7 +24,7 @@ class DataProcessorYahoo(DataProcessor):
         self.tickerList = self.read_all_tickers_from_file()
         self.all_data = []
 
-    def process_data(self):
+    def process_data(self,startDate=None, endDate=None):
         """
         fetch data from Yahoo API (todo rewrite to take ticker as argument ?)
         Returns: Data for the ticker
@@ -34,9 +34,12 @@ class DataProcessorYahoo(DataProcessor):
         fetcher = DataFetcher(self.ticker)
         print(self.ticker)
 
-        minutes_to_go_back, ticker_first_updated, ticker_last_updated = fetcher.fetch_active_period()
+        minutes_to_go_back, ticker_first_updated, ticker_last_updated = fetcher.fetch_active_period(startDate)
         minutes_to_go_back_total = minutes_to_go_back
         # minutes_to_go_back = minutes_to_go_back_total
+
+        if minutes_to_go_back ==0:
+            return None
 
         local_time = market_checker.get_current_time()
         end_date = market_checker.convert_to_market_time(local_time)
@@ -72,7 +75,8 @@ class DataProcessorYahoo(DataProcessor):
 
             start_date = end_date - timedelta(days=min(fetch_days, minutes_to_go_back))
 
-            data = fetcher.fetch_data(start_date.strftime('%Y-%m-%d'), end_date.strftime('%Y-%m-%d'), interval)
+            #This schould now also fetch todays data
+            data = fetcher.fetch_data(start_date.strftime('%Y-%m-%d %H:%M:%S'), end_date.strftime('%Y-%m-%d %H:%M:%S'), interval)
 
             if data is not None:
                 self.all_data.append(data)
@@ -85,11 +89,7 @@ class DataProcessorYahoo(DataProcessor):
         combined_data = pd.concat(self.all_data, ignore_index=True)
         return combined_data
 
-    # Example usage
-    # data = pd.read_csv('your_data.csv')
-    # fig_html = plot_data(data, period='1Y')  # Plot data for the last 1 year
-    # fig_html = plot_data(data, period='2Y')  # Plot data for the last 2 years
-    # fig_html = plot_data(data, period='all')  # Plot all available data
+
 
     def plot_data(self, data, period='all'):
         """
@@ -102,7 +102,7 @@ class DataProcessorYahoo(DataProcessor):
             html of the data
 
         Example:
-            @code
+            @code python
              fig_html = plot_data(data, period='1Y')  # Plot data for the last 1 year
              fig_html = plot_data(data, period='2Y')  # Plot data for the last 2 years
              fig_html = plot_data(data, period='all')  # Plot all available data
