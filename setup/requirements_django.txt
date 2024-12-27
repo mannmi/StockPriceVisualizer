@@ -1,0 +1,15 @@
+# Django API
+# Essential dependencies
+requests
+pandas
+plotly
+sqlalchemy
+pyyaml
+yfinance
+django
+djangorestframework
+markdown
+django-documentation
+pytz
+channels
+websockets

@@ -175,7 +175,8 @@ def setup_linux(venv_dir):
     set_qt_plugin_path()
     create_venv(venv_dir)
     upgrade_pip(venv_dir)
-    install_mysqlclient(venv_dir)
+    # deprcated to be removed (all database is handeld by django api)
+    #install_mysqlclient(venv_dir)
     install_requirements(venv_dir)
 
     print("\nSetup is complete! To activate the virtual environment, run the following command:")

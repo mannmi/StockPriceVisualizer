@@ -107,6 +107,7 @@ def upgrade_pip(venv_dir):
     subprocess.check_call([python_executable, '-m', 'pip', 'install', '--upgrade', 'pip'])
     print("Upgraded pip")
 
+
 def install_mysqlclient(venv_dir):
     """
     @brief Installs the mysqlclient package.
@@ -171,7 +172,8 @@ def setup_windows(venv_dir):
     check_and_install_packages()
     create_venv(venv_dir)
     upgrade_pip(venv_dir)
-    install_mysqlclient(venv_dir)
+    #deprcated to be removed (all database is handeld by django api)
+    #install_mysqlclient(venv_dir)
     install_requirements(venv_dir)
 
     print("\nSetup is complete! To activate the virtual environment, run the following command:")
