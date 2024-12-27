@@ -1,17 +1,12 @@
 services:
   python_app:
     build: .
-    command: /bin/sh -c "python /app/src/server/yahoo/yahoo_db.py && sleep infinity || sleep infinity"
+    command: /bin/sh -c "python /app/src/server/yahoo/yahoo_db.py && sleep infinity && sleep infinity || sleep infinity"
     volumes:
-      #- ./src/server:/app/server
-      #- ./src/os_calls:/app/os_calls
-      #- ./src/config_loader:/app/config_loader
-      #- ./src/marketCheck:/app/marketCheck
-      - ./requirements.txt:/app/requirements.txt
+      - ./setup/requirements_app.txt:/app/requirements.txt
       - ./setup.py:/app/setup.py
       - ./src/:/app/src/
       - ./docker-compose.yml:/app/docker-compose.yml
-      #- ./ui/:/app/ui/
     ports:
       - "5000:5000"
     depends_on:
@@ -26,9 +21,8 @@ services:
     build: .
     command: /bin/sh -c "chmod +x /app/django_project/run.sh && sleep 5 && /app/django_project/run.sh || sleep infinity"
     volumes:
-      - ./requirements.txt:/app/requirements.txt
+      - ./setup/requirements_django.txt:/app/requirements.txt
       - ./django_project:/app/django_project
-      - ./ui/:/app/ui/
       - ./src:/app/src/
       - ./docker-compose.yml:/app/docker-compose.yml
       - ./tmp_data:/app/tmp_data/

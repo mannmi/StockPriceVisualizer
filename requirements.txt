@@ -1,40 +1,30 @@
-requests
-pandas
-matplotlib
-kivy[full]
-kivy_examples
-webview-android
-kivy_garden
-pywebview
-python-telegram-bot
-opencv-python
-pytesseract
-mysql
-plotly
-mysql-connector-python
-sqlalchemy
-pymysql
-pyyaml
-yahoo_fin
-yfinance
-ipywidgets
-django
-djangorestframework
+# Essential dependencies
+#requests #AppUI
+#pandas #ui django app
+#plotly # django
+#sqlalchemy
+#pyyaml
+#yfinance #django app
+#ipywidgets #ui
+#django #django
+#djangorestframework #django
+#PyQt6 #ui
+#qasync #ui
+#PyQt6-WebEngine #ui
+#markdown    #django
+#django-documentation #django
+#pytz #django app
+#channels #django ui
+#websockets #django uno
 
 requests
 pandas
+pyyaml
+ipywidgets
 PyQt6
 qasync
 PyQt6-WebEngine
-markdown
-django
-argparse
-django-documentation
-pytz
-setuptools
-#django-serializers
-#venv
-
-
-
+channels
+websockets
+mysql
 

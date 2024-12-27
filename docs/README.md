@@ -73,7 +73,7 @@ Contributions are welcome! Please see the CONTRIBUTING.md, COMMIT_MESSAGE.md, an
   test it. It now opens a browser tab instead.). Fixed all credits go to => [link](https://stackoverflow.com/questions/39184615/qwebengineview-cannot-load-large-svg-html-using-sethtml)
 - [ ] Fix filter rules
 - [ ] There is currently no protection against race conditions (The watch list load has to be manually triggered).
-- [ ] TODO Split the Requirements.txt into separate files (This will make the installation of the ui Simpler as it does
+- [x] TODO Split the Requirements.txt into separate files (This will make the installation of the ui Simpler as it does
   not need mysql handeler)
 - [x] TODO fix the Historical Data storage, Bug with storing older Data. Data only store for the last x Month but more
   data is fetched. => Please do not check the Fix

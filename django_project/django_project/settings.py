@@ -85,7 +85,6 @@ LOGGING = {
 
 logging.config.dictConfig(LOGGING)
 
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -95,7 +94,21 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'myapp',
+    'websockets_app', # Updated app name
+    'channels',
 ]
+
+#add a socket to listen to and send message with
+ASGI_APPLICATION = 'socket.asgi.application'
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [("127.0.0.1", 6379)],
+        },
+    },
+}
+
 
 DATA_UPLOAD_MAX_MEMORY_SIZE = 10485760  # 10 MB
 
@@ -185,6 +198,3 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-
-

@@ -1,0 +1,11 @@
+# App (crawler) (todo revise list)
+requests #AppUI
+pandas #ui django app
+pyyaml
+ipywidgets
+PyQt6
+qasync
+PyQt6-WebEngine
+channels #django ui
+websockets #django uno
+mysql

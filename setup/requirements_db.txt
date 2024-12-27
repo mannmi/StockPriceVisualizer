@@ -1,0 +1,3 @@
+# DB
+# Essential dependencies
+# no pip packaged needed at the moment

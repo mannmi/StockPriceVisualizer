@@ -5,7 +5,6 @@ REQUIRED_FILES=(
   "/app/requirements.txt"
   "/app/django_project/manage.py"
   "/app/src"
-  "/app/ui"
 )
 
 # Function to check if all required files exist
