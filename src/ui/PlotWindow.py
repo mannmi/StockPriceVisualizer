@@ -18,7 +18,7 @@ logger.info(widgets.__version__)
 
 # Determine the path of the tmp_html directory
 current_dir = os.path.dirname(os.path.abspath(__file__))
-tmp_html_dir = os.path.join(current_dir, 'tmp_html')
+tmp_html_dir = os.path.join(current_dir, '../../tmp_data/tmp_html')
 
 # Create the tmp_html directory if it does not exist
 os.makedirs(tmp_html_dir, exist_ok=True)

@@ -1,6 +1,6 @@
 import pandas as pd
 import mysql.connector
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine #todo migrate fully to sqlalchmy
 from src.config_loader.configLoader import YmlLoader
 from src.logging.logging_config import logger
 from src.os_calls.basic_os_calls import is_running_in_docker

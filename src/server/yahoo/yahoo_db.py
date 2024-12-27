@@ -41,7 +41,7 @@ class Yahoo(DatabaseManager):
         # Ensure Datetime column is in datetime format
         if ('Datetime', '') in df.columns or ('Date', '') in df.columns:
             df[('Datetime', '')] = pd.to_datetime(df[('Datetime', '')], errors='coerce')
-            #df = df.dropna(subset=[('Datetime', ''), ('Date', '')])
+            # df = df.dropna(subset=[('Datetime', ''), ('Date', '')])
 
             # Determine the ticker symbol dynamically
             ticker_symbol = df.columns.get_level_values('Ticker')[1]
@@ -50,9 +50,9 @@ class Yahoo(DatabaseManager):
                 if not isna(row[('Datetime', '')]):
                     datetime_value = row[('Datetime', '')].strftime('%Y-%m-%d %H:%M:%S')
                 else:
-                    #logger.info("got it :)")
+                    # logger.info("got it :)")
                     datetime_value = row[('Date', '')].strftime('%Y-%m-%d %H:%M:%S')
-                #if datetime_value != ticker_symbol:
+                # if datetime_value != ticker_symbol:
                 open_value = row[('Open', ticker_symbol)]
                 high_value = row[('High', ticker_symbol)]
                 low_value = row[('Low', ticker_symbol)]
@@ -104,7 +104,7 @@ class Yahoo(DatabaseManager):
             except Exception as e:
                 logger.error(f"An error occurred for {ticker}: {e}")
 
-    def fetch_and_store_data(self, tickers,api_key, fetch_recent=True ):
+    def fetch_and_store_data(self, tickers, api_key, fetch_recent=True):
         try:
             watcher_list = self.get_ticker_list()
         except Exception as e:
@@ -117,11 +117,11 @@ class Yahoo(DatabaseManager):
         DataProcessorVar = DataProcessorYahoo(tickers, self.tickerFilePath)
         for index, ticker in watcher_list.iterrows():
             DataProcessorVar.ticker = ticker["symbol"]
-            timestamp=0
-            if(fetch_recent):
+            timestamp = 0
+            if (fetch_recent):
                 timestamp = self.get_max_timestamp(ticker["symbol"])
-                #exit()
-            if(timestamp is not None):
+                # exit()
+            if (timestamp is not None):
                 logger.info(f"Get Data in {ticker}")
                 data_store = DataProcessorVar.process_data(timestamp)
                 if data_store is not None:

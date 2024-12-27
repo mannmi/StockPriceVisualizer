@@ -1,72 +1,21 @@
+import concurrent
 import html
 import json
-import os
+import re
 import sys
 import asyncio
+import pandas
 import requests
 import pandas as pd
 from PyQt6.QtWidgets import (
     QApplication, QWidget, QVBoxLayout, QTextEdit, QTableWidget, QTableWidgetItem,
-    QComboBox, QPushButton, QHBoxLayout, QLineEdit, QMenuBar, QMenu
+    QComboBox, QPushButton, QHBoxLayout, QLineEdit, QMenuBar, QMenu, QAbstractItemView
 )
 from PyQt6.QtCore import Qt
 from qasync import QEventLoop, asyncSlot, QtGui
 from src.logging.logging_config import logger
 import src.os_calls.basic_os_calls as os_calls
-from src.os_calls.basic_os_calls import get_root_path
 from src.ui.PlotWindow import PlotWindow, has_render_failed, open_in_browser
-
-
-# todo implement a loading bar
-# class RenderThread(QThread):
-#
-#     update_progress = pyqtSignal(int)
-#     render_complete = pyqtSignal(object)
-#
-#     def __init__(self, filters, watcher=True, fetch_from_file=False):
-#         super().__init__()
-#         self.fetchFromFile = fetch_from_file
-#         # self.runner = runner
-#         self.filters = filters
-#         self.watcher = watcher
-#
-#     def run(self):
-#         if self.watcher:
-#             tickers_list = self.runner.get_tickers()
-#         else:
-#             if self.fetchFromFile:
-#                 tickers_list = self.runner.get_tickers(False)
-#             else:
-#                 tickers_list = self.runner.get_tickers_from_variable()
-#
-#         # Apply filters
-#         total_filters = len(self.filters)
-#         for i, (filter_column, filter_value) in enumerate(self.filters):
-#             if filter_value:
-#                 # Convert wildcard * to regex .*
-#                 filter_value = filter_value.replace('*', '.*')
-#                 tickers_list = tickers_list[
-#                     tickers_list[filter_column.lower()].str.contains(filter_value, case=False, regex=True)]
-#             progress = int(((i + 1) / total_filters) * 100)
-#             self.update_progress.emit(progress)  # Update progress bar
-#
-#         self.render_complete.emit(tickers_list)
-
-
-# class ProgressDialog(QDialog):
-#     def __init__(self, parent=None):
-#         super().__init__(parent)
-#         self.setWindowTitle("Loading")
-#         self.setModal(True)
-#         self.setGeometry(300, 300, 300, 100)
-#
-#         layout = QVBoxLayout()
-#         self.progress_bar = QProgressBar(self)
-#         layout.addWidget(self.progress_bar)
-#         self.setLayout(layout)
-#
-#     def set_progress(self, value):
-#         self.progress_bar.setValue(value)
 
 
 def create_read_only_item(text):
@@ -92,7 +41,7 @@ def store_html(fig_html):
 
     """
     try:
-        with open("./tmp_html/fig_debug.html", "w", encoding="utf-8") as file:
+        with open("../../tmp_data/tmp_html/fig_debug.html", "w", encoding="utf-8") as file:
             file.write(fig_html)
     except Exception as e:
         print(f"Error writing to file: {e}")
@@ -105,36 +54,50 @@ class AppDemo(QWidget):
         """
         super().__init__()
         self.setWindowTitle('Yahoo Async Runner')
-        self.setGeometry(100, 100, 600, 400)
+        screen = QApplication.primaryScreen()
+        size = screen.size()
+        self.setGeometry(0, 0, size.width(), size.height())
         self.plot_windows = []  # Keep track of plot windows
 
+        # Find the absolute Path of Files
         cpath_root = os_calls.get_root_path()
         print(cpath_root)
         api_key_load = "Test key to load"
         docker_config = cpath_root + "/docker-compose.yml"
         config_path = cpath_root + "/config_loader/config.yml"
         ticker_file_path = cpath_root + "/src/server/listing_status.csv"
-        # self.runner = Yahoorunner(api_key_load, docker_config, config_path, ticker_file_path)
 
+        # gernerate Layout for qt
         layout = QVBoxLayout()
 
+        # Add table widget to layout
         self.output = QTextEdit(self)
         self.output.setReadOnly(True)
         layout.addWidget(self.output)
 
         self.table = QTableWidget(self)
+        # self.table.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        self.table.setSortingEnabled(True)
         self.table.setColumnCount(9)
         self.table.setHorizontalHeaderLabels([
             "Symbol", "Name", "Exchange", "Asset Type", "IPO Date", "Delisting Date", "Status", "Watching", "Visualize"
         ])
         layout.addWidget(self.table)
-        self.table.setVisible(False)  # Initially hide the table
+        # Initially hide the table (will only be shwon once data to show")
+        self.table.setVisible(False)
 
-        # Add filter section
+        # Find the mapping for the fields
+        tmp_df = pandas.read_csv(ticker_file_path)
+        # Filter object
+        self.column_names = tmp_df.columns
+        # Create a mapping from column names to indices
+        self.column_mapping = {name: index for index, name in enumerate(self.column_names)}
+
+        # Add filter section layout
         self.filter_layout = QVBoxLayout()
         layout.addLayout(self.filter_layout)
 
-        # Add Apply button
+        # Add Apply button to layout
         btn_apply_filter = QPushButton('Apply Filter', self)
         btn_apply_filter.clicked.connect(self.apply_filter)
         layout.addWidget(btn_apply_filter)
@@ -164,55 +127,10 @@ class AppDemo(QWidget):
         menu_bar.addMenu(ticker_list_menu)
         menu_bar.addMenu(tickers_file_menu)
 
+        # Add menus to ui layout
         layout.setMenuBar(menu_bar)
+        # Set the defined layout as layout for Window
         self.setLayout(layout)
-
-
-
-    def add_filter_row(self):
-        """
-        @brief add filter row
-        Returns:
-
-        """
-        filter_row = QHBoxLayout()
-        filter_input = QLineEdit(self)
-        filter_row.addWidget(filter_input)
-
-        btn_add_filter = QPushButton('Add Filter', self)
-        btn_add_filter.clicked.connect(self.add_filter_row)
-        filter_row.addWidget(btn_add_filter)
-
-        self.filter_layout.addLayout(filter_row)
-
-    @asyncSlot()
-    async def apply_filter(self):
-        """
-        @brief apply filter to the data
-        Returns: None
-
-        """
-        filters = self.get_filters()
-        loop = asyncio.get_event_loop()
-        response = await loop.run_in_executor(None, requests.post, 'http://127.0.0.1:8000/api/apply_filters/',
-                                              {'filters': filters})
-
-        try:
-            response_json = response.json()
-        except requests.exceptions.JSONDecodeError:
-            self.output.append("Error: Received invalid JSON response")
-            return
-
-        if not response_json:
-            self.output.append("Error: Received empty response")
-            return
-
-        tickers_list = pd.DataFrame(response_json)
-
-        # Replace NaN values with None
-        tickers_list = tickers_list.where(pd.notnull(tickers_list), None)
-
-        self.populate_table(tickers_list)
 
     def toggle_table_visibility(self, visible):
         """
@@ -227,57 +145,6 @@ class AppDemo(QWidget):
         """
         self.table.setVisible(visible)
         logger.info(f"Table visibility set to {visible}")
-
-    def add_filter_row(self):
-        """
-        @brief Add a filter to the table.
-        Returns: None
-
-        """
-        filter_row = QHBoxLayout()
-
-        filter_dropdown = QComboBox(self)
-        filter_dropdown.addItems(["Symbol", "Name", "Exchange", "Asset Type"])
-        filter_row.addWidget(filter_dropdown)
-
-        filter_input = QLineEdit(self)
-        filter_input.setPlaceholderText("Enter filter value")
-        filter_row.addWidget(filter_input)
-
-        btn_remove_filter = QPushButton('Remove', self)
-        btn_remove_filter.clicked.connect(lambda: self.remove_filter_row(filter_row))
-        filter_row.addWidget(btn_remove_filter)
-
-        self.filter_layout.addLayout(filter_row)
-
-    def remove_filter_row(self, filter_row):
-        """
-        @brief Remove a filter from the table.
-        Args:
-            filter_row: the filter row to remove.
-
-        Returns: None
-
-        """
-        for i in reversed(range(filter_row.count())):
-            widget = filter_row.itemAt(i).widget()
-            if widget is not None:
-                widget.setParent(None)
-        self.filter_layout.removeItem(filter_row)
-
-    def get_filters(self):
-        """
-        @brief Get all the filters in the table.
-        Returns: the filters list
-
-        """
-        filters = []
-        for i in range(self.filter_layout.count()):
-            filter_row = self.filter_layout.itemAt(i).layout()
-            filter_dropdown = filter_row.itemAt(0).widget()
-            filter_input = filter_row.itemAt(1).widget()
-            filters.append((filter_dropdown.currentText(), filter_input.text()))
-        return filters
 
     @asyncSlot()
     async def get_watched_list(self):
@@ -373,45 +240,6 @@ class AppDemo(QWidget):
         tickers_list = pd.DataFrame(response_json)
         self.populate_table(tickers_list)
 
-    def populate_table(self, tickers_list):
-        """
-        @brief Populate the table with the tickers.
-        Args:
-
-            tickers_list (Pandas Series): List of tickers To populate table with Format
-                (Pandas Series) See docs/ticker_list to see an example.
-
-
-        Returns: None
-
-        """
-        self.output.append(f"Watched List: {tickers_list}")
-        self.table.setRowCount(len(tickers_list))
-
-        for row_index, row in tickers_list.iterrows():
-            self.table.setItem(row_index, 0, create_read_only_item(row['symbol']))
-            self.table.setItem(row_index, 1, create_read_only_item(row['name']))
-            self.table.setItem(row_index, 2, create_read_only_item(row['exchange']))
-            self.table.setItem(row_index, 3, create_read_only_item(row['assetType']))
-            self.table.setItem(row_index, 4, create_read_only_item(str(row['ipoDate'])))
-            self.table.setItem(row_index, 5, create_read_only_item(str(row['delistingDate'])))
-            self.table.setItem(row_index, 6, create_read_only_item(row['status']))
-
-            watching_combobox = QComboBox()
-            watching_combobox.addItems(["False", "True"])
-            watching_combobox.setCurrentText("True" if row['watching'] == 1 else "False")
-            watching_combobox.currentIndexChanged.connect(
-                lambda index, row=row: self.update_watching_status(row, index))
-            self.table.setCellWidget(row_index, 7, watching_combobox)
-
-            btn_visualize = QPushButton('Visualize', self)
-            btn_visualize.clicked.connect(lambda _, row=row: self.visualize_row(row))
-            self.table.setCellWidget(row_index, 8, btn_visualize)
-
-        if not tickers_list.empty:
-            self.toggle_table_visibility(True)
-            self.show()
-
     @asyncSlot()
     async def update_watching_status(self, row, index):
         """
@@ -498,7 +326,6 @@ class AppDemo(QWidget):
                 logger.info("Raw HTML response content:", response.content)
                 logger.info("Decoded HTML response content:", response.text)
             else:
-                # Print the raw JSON response for debugging
                 logger.info("Raw JSON response content:", response.content)
             return response
         else:
@@ -567,6 +394,238 @@ class AppDemo(QWidget):
         if not has_render_failed():
             if not QApplication.instance():
                 app.exec()
+
+    def populate_table(self, tickers_list):
+        """
+        @brief Populate the table with the tickers.
+        Args:
+
+            tickers_list (Pandas Series): List of tickers To populate table with Format
+                (Pandas Series) See docs/ticker_list to see an example.
+
+
+        Returns: None
+
+        """
+        self.output.append(f"Watched List: {tickers_list}")
+        self.table.setRowCount(len(tickers_list))
+
+        for row_index, row in tickers_list.iterrows():
+            self.table.setItem(row_index, 0, create_read_only_item(row['symbol']))
+            self.table.setItem(row_index, 1, create_read_only_item(row['name']))
+            self.table.setItem(row_index, 2, create_read_only_item(row['exchange']))
+            self.table.setItem(row_index, 3, create_read_only_item(row['assetType']))
+            self.table.setItem(row_index, 4, create_read_only_item(str(row['ipoDate'])))
+            self.table.setItem(row_index, 5, create_read_only_item(str(row['delistingDate'])))
+            self.table.setItem(row_index, 6, create_read_only_item(row['status']))
+
+            watching_combobox = QComboBox()
+            watching_combobox.addItems(["False", "True"])
+            watching_combobox.setCurrentText("True" if row['watching'] == 1 else "False")
+            watching_combobox.setObjectName("watching_combobox")
+            watching_combobox.currentIndexChanged.connect(
+                lambda index, row=row: self.update_watching_status(row, index))
+            self.table.setCellWidget(row_index, 7, watching_combobox)
+
+            btn_visualize = QPushButton('Visualize', self)
+            btn_visualize.clicked.connect(lambda _, row=row: self.visualize_row(row))
+            self.table.setCellWidget(row_index, 8, btn_visualize)
+
+        if not tickers_list.empty:
+            self.toggle_table_visibility(True)
+            self.show()
+
+    def get_row_data(self, table, row_index):
+        return [table.item(row_index, col).text() if table.item(row_index, col) is not None else ''
+                for col in range(table.columnCount())]
+
+    def filter_row(self, row_data, filters):
+        if not filters:
+            return True  # No filters, show the row
+
+        result = None  # Initial result is undefined
+
+        # Debug print to show the current row data being checked
+        print(f"Checking row data: {row_data}")
+        print(f"column_mapping {self.column_mapping}")
+
+        for criterion, value, condition in filters:
+            if not value:  # Skip empty filter values
+                continue
+
+            if criterion == "Watching Status":
+                for row_index in range(self.table.rowCount()):
+                    cell_widget = self.table.cellWidget(row_index, 7)
+                    print(cell_widget.objectName() + "object name")
+                    if isinstance(cell_widget, QComboBox) and cell_widget.objectName() == f"watching_combobox":
+                        watching_status = cell_widget.currentText()
+                        match = bool(watching_status == value)
+
+            else:
+                col_index = self.column_mapping.get(criterion)
+                if col_index is not None:
+                    pattern = re.compile(re.escape(value), re.IGNORECASE)
+                    match = bool(pattern.search(row_data[col_index]))
+                else:
+                    match = False  # No match if the column is not found
+
+            # Debug print to show the filter being applied and the result
+            print(f"Applying filter: {criterion} {condition} {value}, Match: {match}")
+
+            if result is None:
+                result = match  # First filter result
+            elif condition == "AND":
+                result = result and match
+            elif condition == "OR":
+                result = result or match
+
+        # Debug print to show the final result for this row
+        print(f"Result for row: {result}")
+
+        return result
+
+    def apply_filter(self):
+        """
+        @brief Apply filter to the data within the table.
+        Returns: None
+        """
+        filters = self.get_filters()
+
+        # Make all rows visible initially
+        for row_index in range(self.table.rowCount()):
+            self.table.setRowHidden(row_index, False)
+
+        # Check if there are any filters
+        if not any(value for _, value, _ in filters):
+            return
+
+        self.parallel_filter_table(self.table, filters)
+
+    def parallel_filter_table(self, table, filters):
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            futures = []
+            for row_index in range(table.rowCount()):
+                row_data = self.get_row_data(table, row_index)
+                # erow_watch_status = self.get_watched_list()
+                futures.append(executor.submit(self.filter_row, row_data, filters))
+
+            # Make all rows visible initially
+            for row_index in range(table.rowCount()):
+                table.setRowHidden(row_index, False)
+
+            # Hide rows that don't match the filter criteria
+            for row_index, future in enumerate(futures):
+                table.setRowHidden(row_index, not future.result())
+
+    def apply_filter(self):
+        """
+        @brief Apply filter to the data within the table.
+        Returns: None
+        """
+        filters = self.get_filters()
+        if filters:
+            self.parallel_filter_table(self.table, filters)
+
+    def get_filters(self):
+        filters = []
+        for i in range(self.filter_layout.count()):
+            filter_row = self.filter_layout.itemAt(i).layout()
+            filter_dropdown = filter_row.itemAt(0).widget()
+            filter_input_container = filter_row.itemAt(1).layout()
+            and_or_dropdown = filter_row.itemAt(2).widget()
+
+            filter_input_widget = filter_input_container.itemAt(0).widget()
+            if isinstance(filter_input_widget, QLineEdit):
+                filter_value = filter_input_widget.text()
+            elif isinstance(filter_input_widget, QComboBox):
+                filter_value = filter_input_widget.currentText()
+
+            filters.append((filter_dropdown.currentText(), filter_value, and_or_dropdown.currentText()))
+        return filters
+
+    def add_filter_row(self):
+        """
+        @brief Add a filter to the table.
+        Returns: None
+        """
+        filter_row = QHBoxLayout()
+
+        filter_dropdown = QComboBox(self)
+        filter_dropdown.addItems(
+            list(self.column_mapping.keys()) + ["Watching Status"])  # Add "Watching Status" to the options
+        filter_row.addWidget(filter_dropdown)
+
+        # Container for filter input or dropdown based on the selected criterion
+        filter_input_container = QHBoxLayout()
+        filter_row.addLayout(filter_input_container)
+
+        # Dropdown for AND/OR condition
+        and_or_dropdown = QComboBox(self)
+        and_or_dropdown.addItems(["AND", "OR"])
+        filter_row.addWidget(and_or_dropdown)
+
+        btn_remove_filter = QPushButton('Remove', self)
+        btn_remove_filter.clicked.connect(lambda: self.remove_filter_row(filter_row))
+        filter_row.addWidget(btn_remove_filter)
+
+        self.filter_layout.addLayout(filter_row)
+
+        # Function to update the filter input based on the selected criterion
+        def update_filter_input():
+            # Remove existing widgets
+            for i in reversed(range(filter_input_container.count())):
+                widget = filter_input_container.itemAt(i).widget()
+                if widget is not None:
+                    widget.setParent(None)
+
+            if filter_dropdown.currentText() == "Watching Status":
+                status_dropdown = QComboBox(self)
+                status_dropdown.addItems(["True", "False"])
+                filter_input_container.addWidget(status_dropdown)
+            else:
+                filter_input = QLineEdit(self)
+                filter_input.setPlaceholderText("Enter filter value")
+                filter_input_container.addWidget(filter_input)
+
+        # Connect the update function to the filter dropdown selection change
+        filter_dropdown.currentIndexChanged.connect(update_filter_input)
+
+        # Initialize the input field based on the initial selection
+        update_filter_input()
+
+    def remove_widgets_recursively(self, layout):
+        """
+        Recursively remove all widgets from the given layout.
+        Args:
+            layout: The QLayout instance to clear.
+        """
+        while layout.count():
+            item = layout.takeAt(0)
+            if isinstance(item, QHBoxLayout) or isinstance(item, QVBoxLayout):
+                self.remove_widgets_recursively(item)
+            elif item.widget():
+                widget = item.widget()
+                widget.deleteLater()
+
+    def remove_filter_row(self, filter_row):
+        """
+        @brief Remove a filter from the table.
+        Args:
+            filter_row: the filter row to remove.
+
+        Returns: None
+        """
+        # Remove all nested widgets from the filter row using the recursive function
+        self.remove_widgets_recursively(filter_row)
+
+        self.filter_layout.removeItem(filter_row)
+
+        # Unhide all rows before reapplying filters
+        for row_index in range(self.table.rowCount()):
+            self.table.setRowHidden(row_index, False)
+
+        # Reapply the filters
+        self.apply_filter()
 
 
 def main():

@@ -71,7 +71,7 @@ Contributions are welcome! Please see the CONTRIBUTING.md, COMMIT_MESSAGE.md, an
   commented out, but fixing it would improve performance when updating the database. The improvement only works on second fetch :) 
 - [x] Switch the graph rendering for the table; it's kind of bad. (Qt web seems to be broken on my system, so I can't
   test it. It now opens a browser tab instead.). Fixed all credits go to => [link](https://stackoverflow.com/questions/39184615/qwebengineview-cannot-load-large-svg-html-using-sethtml)
-- [ ] Fix filter rules
+- [x] Fix filter rules
 - [ ] There is currently no protection against race conditions (The watch list load has to be manually triggered).
 - [x] TODO Split the Requirements.txt into separate files (This will make the installation of the ui Simpler as it does
   not need mysql handeler)
@@ -80,7 +80,9 @@ Contributions are welcome! Please see the CONTRIBUTING.md, COMMIT_MESSAGE.md, an
 - [x] Add Doxygen Documentation. (Add issue if you find missing/faulty docstring)
 
 ## Work on in Future patch
-- [ ] add Multi threading 
+- [ ] add Multi threading (ui)
+- [ ] add Date picker for filter
+- [ ] add drop Down for filter (currently text based except for Watching)
 
 --- 
 
