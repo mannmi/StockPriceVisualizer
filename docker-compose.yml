@@ -7,6 +7,7 @@ services:
       - ./setup.py:/app/setup.py
       - ./src/:/app/src/
       - ./docker-compose.yml:/app/docker-compose.yml
+
     ports:
       - "5000:5000"
     depends_on:
@@ -26,6 +27,7 @@ services:
       - ./src:/app/src/
       - ./docker-compose.yml:/app/docker-compose.yml
       - ./tmp_data:/app/tmp_data/
+      - ./docs:/app/docs
     ports:
       - "8000:8000"
     depends_on:
@@ -33,6 +35,17 @@ services:
     environment:
       - FLASK_RUN_HOST=0.0.0.0
       - PYTHONPATH="$PYTHONPATH:/app/:/app/src/"
+    networks:
+      custom_network:
+        ipv4_address: 172.20.0.3
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./setup/conf/redis.conf:/usr/local/etc/redis/redis.conf
+      - ./tmp_data/logs/redis:/var/log/redis
+    command: sh -c " mkdir -p /var/log/redis && touch /var/log/redis/redis-server.log && redis-server /usr/local/etc/redis/redis.conf "
     networks:
       custom_network:
         ipv4_address: 172.20.0.4
@@ -59,7 +72,7 @@ services:
       retries: 3
     networks:
       custom_network:
-        ipv4_address: 172.20.0.3
+        ipv4_address: 172.20.0.5
 
   test:
     build: .

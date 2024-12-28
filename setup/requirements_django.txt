@@ -13,3 +13,10 @@ django-documentation
 pytz
 channels
 websockets
+ipywidgets
+PyQt6
+qasync
+mysql
+django-redis
+channels_redis
+channels["daphne"]

@@ -50,7 +50,7 @@ hostPort, containerPort = docker_config.data['services']['db']['ports'][0].split
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['172.20.0.3','172.20.0.1','172.20.0.2','172.20.0.4', 'localhost', '127.0.0.1']
 
 # Application definition
 
@@ -86,6 +86,7 @@ LOGGING = {
 logging.config.dictConfig(LOGGING)
 
 INSTALLED_APPS = [
+    "daphne",
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -93,21 +94,70 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'websockets',
     'myapp',
-    'websockets_app', # Updated app name
+    'socket',  # Updated app name
     'channels',
 ]
+# https://django-websocket-redis.readthedocs.io/en/latest/installation.html
+# Specify the URL that distinguishes websocket connections from normal requests
+WEBSOCKET_URL = '/ws/'
+#number in seconds message are kept persisted by Redis
+WS4REDIS_EXPIRE = 7200
 
-#add a socket to listen to and send message with
-ASGI_APPLICATION = 'socket.asgi.application'
+ASGI_APPLICATION = "django_project.asgi.application"
+# settings.py
+CACHES = {
+    'default': {
+        'BACKEND': 'django_redis.cache.RedisCache',
+        'LOCATION': 'redis://:YOUR_STRONG_PASSWORD@redis:6379/1',
+        'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+        }
+    }
+}
+# settings.py
+REDIS_HOST = '172.20.0.4'
+REDIS_PORT = 6379
+
 CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
         'CONFIG': {
-            "hosts": [("127.0.0.1", 6379)],
+            "hosts": [(REDIS_HOST, REDIS_PORT)],
         },
     },
 }
+
+
+
+
+# # add a web_socket to listen to and send message with
+# ASGI_APPLICATION = "web_socket.asgi.application"
+# CHANNEL_LAYERS = {
+#     "default": {
+#         "BACKEND": "channels_redis.core.RedusChannelLayer",
+#         "CONFIG": {
+#             "hosts": [("127.0.0.1", "6379")],
+#         },
+#     },
+# }
+
+# Optional: This is to ensure Django sessions are stored in Redis
+SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
+SESSION_CACHE_ALIAS = 'default'
+
+
+
+# ASGI_APPLICATION = 'web_socket.asgi.application'
+# CHANNEL_LAYERS = {
+#     'default': {
+#         'BACKEND': 'channels_redis.core.RedisChannelLayer',
+#         'CONFIG': {
+#             "hosts": [("127.0.0.1", 6379)],
+#         },
+#     },
+# }
 
 
 DATA_UPLOAD_MAX_MEMORY_SIZE = 10485760  # 10 MB

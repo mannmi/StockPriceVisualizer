@@ -17,6 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from documentation.views import api_documentation_view, raw_markdown_view
+from web_socket.views import websocket_trigger_view
 
 urlpatterns = [
     path('admin/', admin.site.urls),

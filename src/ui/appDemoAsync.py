@@ -1,17 +1,22 @@
 import concurrent
 import html
 import json
+import multiprocessing
 import re
 import sys
 import asyncio
+import threading
+
 import pandas
 import requests
 import pandas as pd
+import websockets
+from PyQt6.QtWebSockets import QWebSocket
 from PyQt6.QtWidgets import (
     QApplication, QWidget, QVBoxLayout, QTextEdit, QTableWidget, QTableWidgetItem,
-    QComboBox, QPushButton, QHBoxLayout, QLineEdit, QMenuBar, QMenu, QAbstractItemView
+    QComboBox, QPushButton, QHBoxLayout, QLineEdit, QMenuBar, QMenu, QAbstractItemView, QLabel
 )
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import Qt, QObject, pyqtSignal, QUrl, QTimer
 from qasync import QEventLoop, asyncSlot, QtGui
 from src.logging.logging_config import logger
 import src.os_calls.basic_os_calls as os_calls
@@ -47,12 +52,56 @@ def store_html(fig_html):
         print(f"Error writing to file: {e}")
 
 
+def start_websocket_client(main_window):
+    app = QApplication([])
+    client = WebSocketClient()
+    client.message_received.connect(main_window.on_message_received)
+    app.exec()
+
+
+class WebSocketClient(QObject):
+    message_received = pyqtSignal(str)
+
+    def __init__(self):
+        super().__init__()
+        self.websocket = QWebSocket()
+        self.websocket.connected.connect(self.on_connected)
+        self.websocket.disconnected.connect(self.on_disconnected)
+        self.websocket.error.connect(self.on_error)
+        self.websocket.textMessageReceived.connect(self.on_message_received)
+        self.open_connection()
+
+    def open_connection(self):
+        self.websocket.open(QUrl('ws://172.20.0.3:8000/ws/message/'))
+
+    def on_connected(self):
+        logger.info("WebSocket connected")
+
+    def on_disconnected(self):
+        logger.info("WebSocket disconnected")
+        self.reconnect()
+
+    def on_error(self, error):
+        logger.error(f"WebSocket Error: {error}")
+        self.reconnect()
+
+    def on_message_received(self, message):
+        data = json.loads(message)
+        logger.info("Message received:", data)
+        self.message_received.emit(json.dumps(data))
+
+    def reconnect(self):
+        QTimer.singleShot(5000, self.open_connection)  # Reconnect after 5 seconds
+
+
 class AppDemo(QWidget):
     def __init__(self):
         """
         Constructor of AppDemo
         """
         super().__init__()
+
+        # ui start
         self.setWindowTitle('Yahoo Async Runner')
         screen = QApplication.primaryScreen()
         size = screen.size()
@@ -132,6 +181,49 @@ class AppDemo(QWidget):
         # Set the defined layout as layout for Window
         self.setLayout(layout)
 
+        # setup Socket Client
+        self.websocket_client = WebSocketClient()
+        self.websocket_client.message_received.connect(self.on_message_received)
+
+        # add table state to check what window user is in
+        self.table_state = None
+
+    def on_message_received(self, message):
+        try:
+            # Parse the JSON string into a Python dictionary
+            data = json.loads(message)
+
+            # Log the received message
+            logger.info(f"UI received message: {data}")
+
+            if data["type"] == "send_event_update":
+                if not data['event_data']:
+                    return
+                event_data = data['event_data']
+                # affected_data = data['affected_data']
+                if event_data['event_type'] == 'ticker_update':
+                    log_out_event = json.dumps(event_data)
+
+                    self.output.append(f"Event: {log_out_event}")
+                    if self.table_state is None:
+                        return
+                    elif self.table_state == "Watch_List":
+                        self.get_watched_list()
+                    elif self.table_state == "all_tickers_file":
+                        print("all_tickers_file")
+                        #self.get_all_tickers_file()
+                    elif self.table_state == "all_tickers_variable":
+                        print("all_tickers_variable")
+                        #self.get_all_tickers_variable()
+                    elif self.table_state == "all_tickers_db":
+                        print("all_tickers_db")
+                        #self.get_all_tickers_db()
+
+        except json.JSONDecodeError as e:
+            logger.error(f"Error decoding JSON message: {e}")
+        except Exception as e:
+            logger.error(f"An error occurred: {e}")
+
     def toggle_table_visibility(self, visible):
         """
         @brief Toggles the visibility of the table.
@@ -154,6 +246,7 @@ class AppDemo(QWidget):
         Returns: None
 
         """
+        self.table_state = "Watch_List"
         loop = asyncio.get_event_loop()
         response = await loop.run_in_executor(None, requests.get, 'http://127.0.0.1:8000/api/get_watched_list_all/')
         try:
@@ -177,6 +270,7 @@ class AppDemo(QWidget):
         Returns: None
 
         """
+        self.table_state = "all_tickers_file"
         loop = asyncio.get_event_loop()
         response = await loop.run_in_executor(None, requests.get, 'http://127.0.0.1:8000/api/get_all_tickers_file/')
         try:
@@ -200,6 +294,7 @@ class AppDemo(QWidget):
         Returns: None
 
         """
+        self.table_state = "all_tickers_db"
         loop = asyncio.get_event_loop()
         response = await loop.run_in_executor(None, requests.get,
                                               'http://127.0.0.1:8000/api/get_tickers_from_variable/')
@@ -218,6 +313,7 @@ class AppDemo(QWidget):
 
     @asyncSlot()
     async def get_all_tickers_variable(self):
+        self.table_state = "all_tickers_variable"
         """
         Get all the tickers From the Variable. And populate the table with the tickers.
 
