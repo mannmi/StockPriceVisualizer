@@ -2,7 +2,6 @@ from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 from django.http import JsonResponse
 from django.shortcuts import render
-
 # Create your views here.
 # from channels.layers import get_channel_layer
 # from asgiref.sync import async_to_sync
@@ -33,9 +32,9 @@ from django.shortcuts import render
 def websocket_trigger_view(request):
     return render(request, 'websocket_trigger.html')
 
+# todo switch to yml
 type_list = ["ticker_update"]
 context = ["Watch_List","all_tickers_file","all_tickers_variable","all_tickers_db"]
-
 
 def trigger_event_update(event_type, affected_data):
     channel_layer = get_channel_layer()
