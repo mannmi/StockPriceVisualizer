@@ -33,6 +33,7 @@ from django.shortcuts import render
 def websocket_trigger_view(request):
     return render(request, 'websocket_trigger.html')
 
+
 type_list = ["ticker_update"]
 context = ["Watch_List","all_tickers_file","all_tickers_variable","all_tickers_db"]
 

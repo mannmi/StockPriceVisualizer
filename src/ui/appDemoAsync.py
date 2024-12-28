@@ -188,6 +188,7 @@ class AppDemo(QWidget):
         # add table state to check what window user is in
         self.table_state = None
 
+
     def on_message_received(self, message):
         try:
             # Parse the JSON string into a Python dictionary
@@ -507,6 +508,8 @@ class AppDemo(QWidget):
         self.table.setRowCount(len(tickers_list))
 
         for row_index, row in tickers_list.iterrows():
+            #https://www.pythonguis.com/tutorials/multithreading-pyqt6-applications-qthreadpool/
+            QApplication.processEvents()
             self.table.setItem(row_index, 0, create_read_only_item(row['symbol']))
             self.table.setItem(row_index, 1, create_read_only_item(row['name']))
             self.table.setItem(row_index, 2, create_read_only_item(row['exchange']))

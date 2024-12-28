@@ -78,13 +78,14 @@ Contributions are welcome! Please see the CONTRIBUTING.md, COMMIT_MESSAGE.md, an
 - [x] TODO fix the Historical Data storage, Bug with storing older Data. Data only store for the last x Month but more
   data is fetched. => Please do not check the Fix
 - [x] Add Doxygen Documentation. (Add issue if you find missing/faulty docstring)
+- [x] Ui repsonsive even during render (solution from https://www.pythonguis.com/tutorials/multithreading-pyqt6-applications-qthreadpool/)
 
 ## Work on in Future patch (To Discus)
-- [ ] add Multi threading (ui)
+- [ ] add Multi threading (ui) => will most likley require a full rewrite (https://stackoverflow.com/questions/67127497/qtablewidget-setcellwidget-creates-windows-of-the-given-widget-while-using-multi)
 - [ ] add Date picker for filter
 - [ ] add drop Down for filter (currently text based except for Watching)
-- [ ] switch to html render on webserv side for the ticket list ?
-- [ ] multi user support (Different users may want different watch lists),,
+- [ ] switch to html render on webserv side for the ticket list ? (see issue with multi threading qt ui)
+- [ ] multi user support (Different users may want different watch lists)
 
 
 --- 
