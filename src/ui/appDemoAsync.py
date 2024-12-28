@@ -210,11 +210,14 @@ class AppDemo(QWidget):
                     elif self.table_state == "Watch_List":
                         self.get_watched_list()
                     elif self.table_state == "all_tickers_file":
-                        self.get_all_tickers_file()
+                        print("all_tickers_file")
+                        #self.get_all_tickers_file()
                     elif self.table_state == "all_tickers_variable":
-                        self.get_all_tickers_variable()
+                        print("all_tickers_variable")
+                        #self.get_all_tickers_variable()
                     elif self.table_state == "all_tickers_db":
-                        self.get_all_tickers_db()
+                        print("all_tickers_db")
+                        #self.get_all_tickers_db()
 
         except json.JSONDecodeError as e:
             logger.error(f"Error decoding JSON message: {e}")
