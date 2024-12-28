@@ -59,20 +59,6 @@ def start_websocket_client(main_window):
     app.exec()
 
 
-class Worker(QObject):
-    finished = pyqtSignal()
-    row_populated = pyqtSignal(int, dict)
-
-    def __init__(self, tickers_list):
-        super().__init__()
-        self.tickers_list = tickers_list
-
-    def run(self):
-        for row_index, row in self.tickers_list.iterrows():
-            self.row_populated.emit(row_index, row.to_dict())
-        self.finished.emit()
-
-
 class WebSocketClient(QObject):
     message_received = pyqtSignal(str)
 
@@ -203,7 +189,6 @@ class AppDemo(QWidget):
         self.table_state = None
 
 
-
     def on_message_received(self, message):
         try:
             # Parse the JSON string into a Python dictionary
@@ -227,13 +212,13 @@ class AppDemo(QWidget):
                         self.get_watched_list()
                     elif self.table_state == "all_tickers_file":
                         print("all_tickers_file")
-                        # self.get_all_tickers_file()
+                        #self.get_all_tickers_file()
                     elif self.table_state == "all_tickers_variable":
                         print("all_tickers_variable")
-                        # self.get_all_tickers_variable()
+                        #self.get_all_tickers_variable()
                     elif self.table_state == "all_tickers_db":
                         print("all_tickers_db")
-                        # self.get_all_tickers_db()
+                        #self.get_all_tickers_db()
 
         except json.JSONDecodeError as e:
             logger.error(f"Error decoding JSON message: {e}")
