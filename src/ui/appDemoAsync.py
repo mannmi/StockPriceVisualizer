@@ -337,6 +337,9 @@ class AppDemo(QWidget):
         tickers_list = pd.DataFrame(response_json)
         self.populate_table(tickers_list)
 
+    async def update_watching_status_async(self, row, index):
+        await self.update_watching_status(row, index)
+
     @asyncSlot()
     async def update_watching_status(self, row, index):
         """
@@ -509,7 +512,7 @@ class AppDemo(QWidget):
 
         for row_index, row in tickers_list.iterrows():
             #https://www.pythonguis.com/tutorials/multithreading-pyqt6-applications-qthreadpool/
-            QApplication.processEvents()
+            #QApplication.processEvents()
             self.table.setItem(row_index, 0, create_read_only_item(row['symbol']))
             self.table.setItem(row_index, 1, create_read_only_item(row['name']))
             self.table.setItem(row_index, 2, create_read_only_item(row['exchange']))
@@ -523,7 +526,7 @@ class AppDemo(QWidget):
             watching_combobox.setCurrentText("True" if row['watching'] == 1 else "False")
             watching_combobox.setObjectName("watching_combobox")
             watching_combobox.currentIndexChanged.connect(
-                lambda index, row=row: self.update_watching_status(row, index))
+                lambda index, row=row: self.update_watching_status_async(row, index))
             self.table.setCellWidget(row_index, 7, watching_combobox)
 
             btn_visualize = QPushButton('Visualize', self)
