@@ -13,6 +13,8 @@ import src.os_calls.basic_os_calls as os_calls
 from src.server.yahoo.Yahoorunner import Yahoorunner
 import logging
 
+from web_socket.views import trigger_event_update, type_list, context
+
 if os_calls.is_running_in_docker():
     cpathRoot = os.path.abspath("/app/")
 else:
@@ -128,6 +130,8 @@ class AddToWatchList(APIView):
         """
         tickers = request.data.get('tickers')
         runner.add_to_watch_list(tickers)
+        trigger_event_update(type_list[0],context[0])
+        trigger_event_update(type_list[0],context[3])
         return Response({'status': 'success'}, status=status.HTTP_200_OK)
 
 
@@ -146,6 +150,10 @@ class RemoveFromWatchList(APIView):
         """
         tickers = request.data.get('tickers')
         runner.remove_from_watch_list(tickers)
+        #send messege through socket to update
+        trigger_event_update(type_list[0],context[0])
+        trigger_event_update(type_list[0],context[3])
+
         return Response({'status': 'success'}, status=status.HTTP_200_OK)
 
 
@@ -163,6 +171,9 @@ class UpdateTickerList(APIView):
         @return A response indicating the ticker list has been updated.
         """
         runner.update_ticker_list()
+        trigger_event_update(type_list[0],context[1])
+        trigger_event_update(type_list[0],context[2])
+
         return Response({'status': 'Ticker list updated'}, status=status.HTTP_200_OK)
 
 
@@ -181,6 +192,7 @@ class StoreTickerList(APIView):
         """
         tickers = request.data.get('tickers')
         runner.store_ticker_list(tickers)
+        trigger_event_update(type_list[0],context[3])
         return Response({'status': 'Ticker list stored'}, status=status.HTTP_200_OK)
 
 
