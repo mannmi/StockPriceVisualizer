@@ -84,6 +84,8 @@ Contributions are welcome! Please see the CONTRIBUTING.md, COMMIT_MESSAGE.md, an
 - [ ] add Date picker for filter
 - [ ] add drop Down for filter (currently text based except for Watching)
 - [ ] switch to html render on webserv side for the ticket list ?
+- [ ] multi user support (Different users may want different watch lists),,
+
 
 --- 
 
